@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Smoothie Bar - Ratio Team Game</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:-apple-system,"Helvetica Neue",Arial,sans-serif;}
+  html,body{margin:0;height:100%;}
+  body{background:#10212f;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#1f2933;}
+  #app{width:100%;height:100%;max-width:1180px;max-height:900px;background:#f3f8fd;position:relative;display:flex;flex-direction:column;}
+  .hide{display:none!important;}
+  /* top */
+  .top{display:flex;align-items:flex-start;gap:10px;padding:12px 14px 0;}
+  .cust{flex:0 0 auto;text-align:center;width:120px;}
+  .cust .role{font-size:12px;color:#6b7884;font-weight:700;margin-top:-4px;}
+  .bubble{position:relative;background:#fff;border:3px solid #13395c;border-radius:18px;padding:10px 18px;flex:1;margin-left:10px;}
+  .bubble:before{content:"";position:absolute;left:-16px;top:26px;border-width:10px 16px 10px 0;border-style:solid;border-color:transparent #13395c transparent transparent;}
+  .bubble .hi{font-size:17px;font-weight:800;color:#13395c;}
+  .bubble .ord{font-size:26px;font-weight:900;color:#0f3a5f;margin-top:2px;line-height:1.15;}
+  .meta{flex:0 0 auto;text-align:right;font-weight:800;color:#13395c;font-size:15px;}
+  .remind{background:#fff4e8;border:2px solid #f3c98a;border-radius:12px;margin:10px 14px;padding:7px 12px;
+    font-size:15px;font-weight:800;color:#a35a12;text-align:center;}
+  /* stations */
+  .stations{display:flex;gap:10px;flex:1;padding:0 14px;min-height:0;}
+  .st{flex:1;background:#fff;border:4px solid;border-radius:16px;display:flex;flex-direction:column;align-items:center;overflow:hidden;}
+  .sthd{width:100%;color:#fff;display:flex;align-items:center;justify-content:center;gap:6px;padding:7px;font-weight:900;font-size:17px;}
+  .amt{font-size:54px;font-weight:900;color:#13395c;margin:6px 0 0;line-height:1;}
+  .pm{display:flex;gap:12px;margin:10px 0;}
+  .pm button{width:60px;height:60px;border-radius:15px;border:none;color:#fff;font-size:32px;font-weight:900;line-height:1;}
+  .pm .mn{background:#b9c4ce;} .pm button:active{transform:scale(.9);}
+  .rdy{margin-top:auto;margin-bottom:12px;font-size:14px;font-weight:800;color:#9aa9b7;border:2px dashed #cdd9e4;
+    border-radius:22px;padding:8px 18px;cursor:pointer;}
+  .rdy.on{background:#2e9e5b;color:#fff;border-color:#2e9e5b;border-style:solid;}
+  /* foot */
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 14px 14px;}
+  .hintbtn{background:#dbe7f3;color:#13395c;border:none;border-radius:12px;padding:11px 16px;font-size:14px;font-weight:800;}
+  .blend{background:#13395c;color:#fff;border:none;font-size:22px;font-weight:900;border-radius:16px;padding:13px 50px;}
+  .blend:disabled{background:#aab6c2;}
+  .fb{flex:1;text-align:center;font-size:18px;font-weight:800;min-height:24px;}
+  .fb.ok{color:#1f8a4c;} .fb.no{color:#c0392b;}
+  /* overlay */
+  .ov{position:absolute;inset:0;background:rgba(16,33,47,.94);color:#fff;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;padding:24px;z-index:20;}
+  .ov h1{font-size:34px;margin:6px 0;} .ov p{font-size:17px;max-width:680px;line-height:1.6;opacity:.95;}
+  .ov .big{font-size:70px;}
+  .ov button{margin-top:18px;background:#2e9e5b;color:#fff;border:none;border-radius:16px;padding:15px 44px;font-size:20px;font-weight:900;}
+  .helpanel{position:absolute;left:14px;right:14px;bottom:78px;background:#fff;border:2px solid #13395c;border-radius:14px;
+    padding:10px 14px;z-index:10;box-shadow:0 6px 20px rgba(0,0,0,.2);}
+  .helprow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-weight:800;color:#13395c;font-size:15px;margin:3px 0;}
+  .chip{display:inline-flex;align-items:center;gap:4px;background:#f3f7fb;border:1px solid #dbe7f3;border-radius:18px;padding:2px 8px;}
+  .num{color:#fff;font-weight:900;border-radius:12px;min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;padding:0 4px;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="game"></div>
+  <div id="overlay" class="ov">
+    <div class="big">🥤</div>
+    <h1>Smoothie Bar - Team Game</h1>
+    <p><b>You are one smoothie crew (4 friends).</b><br>
+    Each player looks after ONE ingredient:
+    <b style="color:#ff9f1c">Orange</b>, <b style="color:#e63950">Strawberry</b>,
+    <b style="color:#2e9e5b">Green tea</b>, <b style="color:#6aa9d8">Milk</b>.<br><br>
+    Read the customer's order, find the drink on your paper <b>Recipe Card</b>,
+    work out how many presses YOUR ingredient needs, then tap <b>+</b>.<br>
+    When all four tap <b>Ready</b>, press <b>BLEND!</b> Serve 5 customers. Good luck!</p>
+    <button onclick="startGame()">Start serving</button>
+  </div>
+</div>
+<script>
+"use strict";
+/* ---------- icons ---------- */
+function svg(inner,s){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle">'+inner+'</svg>';}
+function orange(s){return svg('<path d="M50 24 q14 -10 24 -3 q-5 13 -23 9 Z" fill="#2e9e5b"/><circle cx="50" cy="58" r="33" fill="#ff9f1c" stroke="#cc7000" stroke-width="4"/><circle cx="40" cy="48" r="8" fill="#ffd28a"/>',s);}
+function strawberry(s){return svg('<path d="M50 90 C26 80 20 54 30 42 C40 32 60 32 70 42 C80 54 74 80 50 90 Z" fill="#e63950" stroke="#a3132b" stroke-width="4"/><path d="M34 42 L50 26 L66 42 C58 47 42 47 34 42 Z" fill="#2e9e5b" stroke="#1f6e43" stroke-width="3"/><circle cx="44" cy="58" r="2.4" fill="#ffe08a"/><circle cx="56" cy="58" r="2.4" fill="#ffe08a"/><circle cx="50" cy="70" r="2.4" fill="#ffe08a"/>',s);}
+function tea(s){return svg('<path d="M26 40 h48 l-5 40 q-1 9 -11 9 h-16 q-10 0 -11 -9 Z" fill="#eafaf0" stroke="#2f7d57" stroke-width="4"/><path d="M30 44 h40 l-1.5 11 q-19 6 -37 0 Z" fill="#3a9e63"/><path d="M74 48 q14 2 12 16 q-2 11 -14 11" fill="none" stroke="#2f7d57" stroke-width="4"/>',s);}
+function milk(s){return svg('<path d="M34 46 h32 v44 h-32 Z" fill="#ffffff" stroke="#3b6fa0" stroke-width="4"/><path d="M34 46 L50 28 L66 46 Z" fill="#6aa9d8" stroke="#3b6fa0" stroke-width="4"/><rect x="41" y="60" width="18" height="16" rx="2" fill="#cfe6fb" stroke="#3b6fa0" stroke-width="2"/>',s);}
+function customer(s,gender,shirt){
+  var skin="#ffd9b3";
+  var hair = gender==="girl"
+    ? '<path d="M26 44 q24 -34 48 0 q4 26 -4 34 q-6 -22 -20 -22 q-14 0 -20 22 q-8 -8 -4 -34 Z" fill="#5a3a25"/><circle cx="24" cy="60" r="8" fill="#5a3a25"/><circle cx="76" cy="60" r="8" fill="#5a3a25"/>'
+    : '<path d="M26 46 q24 -30 48 0 q0 -2 0 -2 q-6 -14 -24 -14 q-18 0 -24 14 Z" fill="#3a2a1a"/>';
+  return svg('<path d="M22 110 q28 -26 56 0 v8 h-56 Z" fill="'+shirt+'"/><circle cx="50" cy="54" r="30" fill="'+skin+'" stroke="#e0b48a" stroke-width="2"/>'+hair+'<circle cx="40" cy="54" r="3.4" fill="#3a2a1a"/><circle cx="60" cy="54" r="3.4" fill="#3a2a1a"/><path d="M42 66 q8 7 16 0" fill="none" stroke="#b5563a" stroke-width="3" stroke-linecap="round"/><circle cx="34" cy="62" r="4" fill="#ffb3b3" opacity="0.7"/><circle cx="66" cy="62" r="4" fill="#ffb3b3" opacity="0.7"/>',s);
+}
+var ICON=[orange,strawberry,tea,milk];
+var ING=[["Orange","#ff9f1c"],["Strawberry","#e63950"],["Green tea","#3a9e63"],["Milk","#6aa9d8"]];
+
+/* ---------- data ---------- */
+var DRINKS=[
+ {name:"Sunrise Fizz",color:"#ff8a3c",r:[3,1,1,1]},
+ {name:"Berry Cloud", color:"#e63950",r:[1,3,1,1]},
+ {name:"Jade Cooler", color:"#2e9e5b",r:[1,1,3,1]},
+ {name:"Cloud Milk",  color:"#4a90d9",r:[1,1,1,3]},
+ {name:"Rainbow Mix", color:"#8a5cd0",r:[2,2,1,1]},
+];
+var NAMES_G=["Mia","Yan","Joy","Ka","Sum","Hei"];
+var NAMES_B=["Tim","Sam","Ben","Ho","Ming","Lok"];
+var SHIRTS=["#e0556a","#4a90d9","#f0a93c","#2e9e5b","#8a5cd0"];
+
+var S={n:0,total:5,score:0,order:null,req:[0,0,0,0],amt:[0,0,0,0],ready:[false,false,false,false],locked:false,cust:null,help:false};
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function pick(a){return a[rnd(0,a.length-1)];}
+function $(id){return document.getElementById(id);}
+
+function startGame(){S.n=0;S.score=0;$('overlay').classList.add('hide');nextCustomer();}
+
+function makeOrder(n){
+  // difficulty curve over 5 customers
+  var items;
+  if(n<=1){ items=[{d:rnd(0,4),q:1}]; }
+  else if(n===2){ items=[{d:rnd(0,4),q:2}]; }
+  else if(n===3){ items=[{d:rnd(0,4),q:rnd(2,3)}]; }
+  else if(n===4){ var a=rnd(0,4),b=rnd(0,4); while(b===a)b=rnd(0,4); items=[{d:a,q:1},{d:b,q:1}]; }
+  else { var a2=rnd(0,4),b2=rnd(0,4); while(b2===a2)b2=rnd(0,4); items=[{d:a2,q:3},{d:b2,q:1}]; }
+  return items;
+}
+function reqFrom(items){var r=[0,0,0,0];items.forEach(function(it){for(var i=0;i<4;i++)r[i]+=DRINKS[it.d].r[i]*it.q;});return r;}
+function orderText(items){
+  if(items.length===1){var it=items[0];var cup=it.q===1?"cup":"cups";
+    return 'I want <b style="color:'+DRINKS[it.d].color+'">'+it.q+' '+cup+' of '+DRINKS[it.d].name+'</b>!';}
+  return 'I want '+items.map(function(it){return '<b style="color:'+DRINKS[it.d].color+'">'+it.q+' '+DRINKS[it.d].name+'</b>';}).join(' and ')+'!';
+}
+
+function nextCustomer(){
+  S.n++;
+  if(S.n>S.total){return endGame();}
+  S.order=makeOrder(S.n);
+  S.req=reqFrom(S.order);
+  S.amt=[0,0,0,0];S.ready=[false,false,false,false];S.locked=false;S.help=false;
+  var g=Math.random()<0.5?"girl":"boy";
+  S.cust={svg:customer(120,g,pick(SHIRTS)),name:(g==="girl"?pick(NAMES_G):pick(NAMES_B))};
+  render();
+}
+
+function render(){
+  var allReady=S.ready.every(function(x){return x;});
+  var stations="";
+  for(var i=0;i<4;i++){
+    stations+='<div class="st" style="border-color:'+ING[i][1]+'">'+
+      '<div class="sthd" style="background:'+ING[i][1]+'">'+ICON[i](36)+'<span>'+ING[i][0]+'</span></div>'+
+      '<div class="amt">'+S.amt[i]+'</div>'+
+      '<div class="pm"><button class="mn" onclick="chg('+i+',-1)">&minus;</button>'+
+      '<button style="background:'+ING[i][1]+'" onclick="chg('+i+',1)">+</button></div>'+
+      '<div class="rdy'+(S.ready[i]?' on':'')+'" onclick="toggleReady('+i+')">'+(S.ready[i]?'READY':'tap when ready')+'</div>'+
+      '</div>';
+  }
+  var help="";
+  if(S.help){
+    help='<div class="helpanel"><div style="font-weight:900;color:#13395c;margin-bottom:4px">Recipe (per cup):</div>'+
+      S.order.map(function(it){
+        var d=DRINKS[it.d];
+        var chips=ING.map(function(g,i){return '<span class="chip">'+ICON[i](22)+'<span class="num" style="background:'+g[1]+'">'+d.r[i]+'</span></span>';}).join(' ');
+        return '<div class="helprow"><b style="color:'+d.color+'">'+d.name+'</b> &times; '+it.q+' :&nbsp; '+chips+'</div>';
+      }).join('')+'</div>';
+  }
+  $('game').innerHTML=
+    '<div class="top">'+
+      '<div class="cust">'+S.cust.svg+'<div class="role">Customer</div></div>'+
+      '<div class="bubble"><div class="hi">Hi, I\'m '+S.cust.name+'!</div><div class="ord">'+orderText(S.order)+'</div></div>'+
+      '<div class="meta">Order '+S.n+' / '+S.total+'<br>&#9733; '+S.score+'</div>'+
+    '</div>'+
+    '<div class="remind">Look up the drink(s) on your paper Recipe Card, then each player presses YOUR ingredient.</div>'+
+    '<div class="stations">'+stations+'</div>'+
+    help+
+    '<div class="foot">'+
+      '<button class="hintbtn" onclick="toggleHelp()">'+(S.help?'Hide recipe':'Need help?')+'</button>'+
+      '<div class="fb" id="fb"></div>'+
+      '<button class="blend" id="blendbtn" '+(allReady?'':'disabled')+' onclick="blend()">BLEND!</button>'+
+    '</div>';
+}
+function chg(i,d){if(S.locked)return;S.amt[i]=Math.max(0,Math.min(25,S.amt[i]+d));S.ready[i]=false;render();}
+function toggleReady(i){if(S.locked)return;if(S.amt[i]<=0){flash('Add some '+ING[i][0]+' first!','no');return;}S.ready[i]=!S.ready[i];render();}
+function toggleHelp(){S.help=!S.help;render();}
+function flash(m,c){var e=$('fb');if(e){e.textContent=m;e.className='fb '+(c==='ok'?'ok':'no');}}
+
+function blend(){
+  if(S.locked)return;
+  var wrong=[];
+  for(var i=0;i<4;i++){ if(S.amt[i]!==S.req[i]) wrong.push(ING[i][0]); }
+  if(wrong.length===0){
+    S.locked=true;S.score+=10;
+    flash('Perfect! '+S.cust.name+' is happy! +10','ok');
+    bigFeed('😋');
+    setTimeout(nextCustomer,1400);
+  } else {
+    flash('Not yet - check '+wrong.join(' & ')+'.','no');
+    S.ready=[false,false,false,false];render();
+    flash('Not yet - check '+wrong.join(' & ')+'.','no');
+  }
+}
+function bigFeed(e){
+  var d=document.createElement('div');d.textContent=e;
+  d.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;z-index:15;pointer-events:none;';
+  $('app').appendChild(d);setTimeout(function(){d.remove();},1200);
+}
+function endGame(){
+  $('overlay').classList.remove('hide');
+  $('overlay').innerHTML='<div class="big">🎉🏆</div><h1>Shift complete!</h1>'+
+    '<p>Great teamwork! You served all '+S.total+' customers.</p>'+
+    '<div style="font-size:60px;font-weight:900;color:#ffd24a">&#9733; '+S.score+'</div>'+
+    '<button onclick="startGame()">Play again</button>';
+}
+</script>
+</body>
+</html>
