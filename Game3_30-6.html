@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Reef Rescue - Balance the Tanks</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:-apple-system,"Helvetica Neue",Arial,sans-serif;}
+  html,body{margin:0;height:100%;}
+  body{background:#06222e;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#10303d;}
+  #app{width:100%;max-width:1040px;min-height:560px;max-height:96vh;background:#eaf7f8;position:relative;display:flex;flex-direction:column;}
+  .hide{display:none!important;}
+  .statusbar{background:#0e4d63;color:#fff;padding:7px 16px;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px;flex:0 0 auto;}
+  .statusbar .ttl{display:flex;align-items:center;gap:8px;}
+  .homebtn{background:rgba(255,255,255,.18);border:none;color:#fff;font-weight:900;font-size:13px;border-radius:9px;padding:5px 11px;margin-right:8px;cursor:pointer;flex:0 0 auto;transition:transform .07s ease,filter .07s ease;}
+  .homebtn:active{transform:scale(.92);filter:brightness(.9);}
+  .statusbar .pill{background:rgba(255,255,255,.16);border-radius:16px;padding:3px 12px;margin-left:6px;}
+  .statusbar .pill b{font-weight:900;font-size:16px;}
+  .statusbar .time.warn{color:#ffe08a;}
+  #lvlnum{display:inline-block;transition:color .35s ease;}
+  #scoreNum{background:linear-gradient(90deg,#ffe14a,#ff9f1c 55%,#ff5a3c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;}
+  .staricon{display:inline-block;color:#ffd24a;transform-origin:center;}
+  .staricon.pop{animation:starpop .65s cubic-bezier(.3,1.4,.5,1);}
+  @keyframes starpop{0%{transform:scale(1) rotate(0);}30%{transform:scale(1.85) rotate(22deg);filter:drop-shadow(0 0 8px #ffd24a);}60%{transform:scale(.85) rotate(-12deg);}100%{transform:scale(1) rotate(0);}}
+  .wrap{flex:1;display:flex;flex-direction:column;padding:9px 15px;min-height:0;overflow:hidden;}
+  .task{display:flex;align-items:center;gap:12px;background:#d6f0f5;border:2px solid #b9e2ea;border-radius:13px;padding:6px 13px;}
+  .task .bubble{flex:1;background:#fff;border:2.5px solid #0e4d63;border-radius:13px;padding:6px 13px;}
+  .task .bubble .hi{font-size:12px;font-weight:800;color:#0e6a7a;}
+  .task .bubble .ms{font-size:15px;font-weight:900;color:#0e3a4a;line-height:1.2;}
+  .chart{flex:0 0 auto;background:#fff;border:2px solid #b9e2ea;border-radius:12px;padding:5px 12px;text-align:center;}
+  .chart .cl{font-size:10px;font-weight:800;color:#0e6a7a;}
+  .chart .cv{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:900;color:#0e3a4a;margin-top:2px;}
+  .chart .cv .grp{display:inline-flex;align-items:center;gap:2px;}
+  .chart .cv .sep{color:#9fb6c9;}
+  .chart.alt .cv2{font-size:11px;font-weight:800;color:#0e6a7a;margin-top:3px;}
+  .bandtag{font-size:9px;font-weight:900;color:#fff;border-radius:8px;padding:1px 7px;margin-left:6px;vertical-align:middle;}
+  .reqbox{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;font-weight:800;color:#0e4d63;margin:0 0 4px;}
+  .ratiobox{display:inline-flex;align-items:center;gap:5px;border:2.5px solid #0e4d63;background:#fff3c4;border-radius:9px;padding:2px 12px;font-size:17px;font-weight:900;white-space:nowrap;box-shadow:0 2px 0 rgba(14,77,99,.25);}
+  .ratiobox .rc{color:#0e4d63;font-size:14px;}
+  /* answer reveal modal */
+  .ansmodal{position:absolute;inset:0;background:rgba(18,28,36,.82);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .anscard{background:#fff;border-radius:18px;padding:16px 22px 18px;max-width:660px;width:100%;box-shadow:0 18px 50px rgba(0,0,0,.55);}
+  .anshd{font-size:18px;font-weight:900;color:#0e3a4a;text-align:center;}
+  .anssub{font-size:12.5px;font-weight:700;color:#7a8794;text-align:center;margin:3px 0 12px;}
+  .ansrows{display:flex;flex-direction:column;gap:7px;}
+  .ansrow{display:flex;align-items:center;gap:12px;background:#f1fafb;border:2px solid #d8eef2;border-radius:12px;padding:7px 12px;}
+  .ansname{flex:0 0 116px;font-size:14px;font-weight:900;color:#0e4d63;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .ansfish{flex:1;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+  .ansfish .af{display:inline-flex;align-items:center;gap:4px;font-size:16px;font-weight:900;color:#0e3a4a;}
+  .mtank{position:relative;flex:1;background:linear-gradient(180deg,#bdeaf5,#7fcfe6);border:2.5px solid #2f8fa8;border-radius:8px;padding:5px 5px 12px;display:flex;gap:5px;align-items:flex-start;min-height:58px;overflow:hidden;}
+  .mtank .mspcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .mtank .sand{position:absolute;left:0;right:0;bottom:0;height:9px;background:#ecd9a6;border-top:2px solid #d8c184;}
+  .ansfoot{display:flex;align-items:center;justify-content:space-between;margin-top:14px;}
+  .ansfoot #anscount{font-size:13px;font-weight:800;color:#a35a12;}
+  .ansfoot button{background:#2e9e5b;color:#fff;border:none;border-radius:12px;padding:10px 28px;font-size:16px;font-weight:900;cursor:pointer;}
+  .ansfoot button:active{transform:scale(.95);}
+  .rtimer{display:flex;align-items:center;gap:9px;margin:7px 0 3px;}
+  .rtimer .lab{font-size:12px;font-weight:800;color:#0e4d63;white-space:nowrap;}
+  .rtimer .rbarwrap{flex:1;height:14px;background:#cfe2e6;border-radius:8px;overflow:hidden;}
+  .rtimer .rbar{height:100%;width:100%;background:#2e9e5b;border-radius:8px;transition:width .9s linear,background .3s;}
+  .rtimer .rsec{font-size:14px;font-weight:900;color:#0e4d63;min-width:42px;text-align:right;}
+  /* two tanks */
+  .tanks{display:flex;gap:12px;flex:1;min-height:0;margin-top:2px;}
+  .tankcol{flex:1;display:flex;flex-direction:column;min-height:0;}
+  .tankhdr{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:900;color:#0e4d63;padding:0 4px 3px;}
+  .tankhdr .ok{font-size:12px;font-weight:900;border-radius:10px;padding:2px 9px;}
+  .tankhdr .ok.yes{background:#d8f1df;color:#1f8a4c;} .tankhdr .ok.no{background:#fde9c9;color:#a35a12;}
+  .tank{position:relative;flex:1;min-height:130px;background:linear-gradient(180deg,#bdeaf5,#7fcfe6);border:3px solid #2f8fa8;border-top-width:5px;border-radius:10px;padding:8px 6px 16px;display:flex;gap:5px;align-items:flex-start;overflow:hidden;}
+  .tank.hot{border-color:#2e9e5b;box-shadow:0 0 0 3px #bfe6cd inset;}
+  .tank .sand{position:absolute;left:0;right:0;bottom:0;height:13px;background:#ecd9a6;border-top:2px solid #d8c184;}
+  .spcol{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;z-index:1;}
+  .fishw{flex:0 0 auto;z-index:1;cursor:grab;touch-action:none;display:inline-flex;}
+  .fishw:active{cursor:grabbing;}
+  .dragclone{position:fixed;z-index:60;pointer-events:none;transform:translate(-50%,-50%) scale(1.15);filter:drop-shadow(0 6px 8px rgba(0,0,0,.35));}
+  .fb{text-align:center;font-size:14px;font-weight:800;min-height:18px;margin-top:6px;flex:0 0 auto;}
+  .fb.ok{color:#1f8a4c;}.fb.no{color:#c0392b;}
+  .foot{display:flex;align-items:center;gap:12px;flex:0 0 auto;margin-top:6px;}
+  .hintbtn{background:#f0a93c;color:#fff;border:none;border-radius:11px;padding:10px 14px;font-size:13px;font-weight:800;flex:0 0 auto;}
+  .hintbtn:active{transform:scale(.95);}
+  .hintrow{display:flex;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:800;color:#8a5a12;background:#fff7e6;border:1.5px solid #f0c98a;border-radius:8px;padding:2px 6px;margin:0 0 4px;}
+  .legend{font-size:11px;font-weight:800;color:#0e6a7a;display:flex;align-items:center;gap:8px;flex:0 0 auto;}
+  .legend span{display:inline-flex;align-items:center;gap:3px;}
+  .reef{flex:1;background:#fff;border:2px solid #b9e2ea;border-radius:12px;padding:5px 12px;min-width:0;}
+  .reef .t{font-size:11px;font-weight:800;color:#0e6a7a;display:flex;justify-content:space-between;}
+  .reefbarwrap{height:13px;background:#e6f1f3;border-radius:7px;overflow:hidden;margin-top:3px;}
+  .reefbar{height:100%;width:0;background:linear-gradient(90deg,#7fe0c0,#2e9e5b);transition:width .4s;}
+  /* overlay */
+  .ov{position:absolute;inset:0;background:rgba(6,34,46,.96);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;z-index:40;overflow:auto;}
+  .ov h1{font-size:28px;margin:6px 0;}.ov p{font-size:14.5px;max-width:720px;line-height:1.55;opacity:.95;}
+  .ov .big{font-size:52px;}
+  .startcard{background:#fff;border-radius:24px;padding:20px 26px 24px;max-width:680px;color:#0e3a4a;box-shadow:0 18px 50px rgba(0,0,0,.45);}
+  .startcard .ttl{font-size:23px;font-weight:900;color:#0e3a4a;text-align:center;}
+  .flow{display:flex;align-items:center;justify-content:center;gap:6px;margin:16px 0 8px;}
+  .stepc{flex:1;background:#f1fafb;border:2px solid #d8eef2;border-radius:16px;padding:10px 6px 12px;text-align:center;}
+  .stepc .tx{font-size:13.5px;font-weight:900;color:#0e4d63;margin-top:4px;line-height:1.25;}
+  .flow .arr{font-size:26px;color:#9fc6d2;font-weight:900;flex:0 0 auto;}
+  .hintline{display:flex;align-items:center;justify-content:center;gap:18px;font-size:15px;font-weight:900;color:#5f7b82;margin-top:6px;}
+  .grouprow{display:flex;align-items:center;justify-content:center;gap:7px;margin:14px 0 2px;}
+  .grouprow .gl{font-size:15px;font-weight:900;color:#0e4d63;margin-right:3px;}
+  .grouprow.warn .gl{color:#c0392b;}
+  .gbtn{width:40px;height:40px;border-radius:11px;border:2px solid #cfe6f2;background:#fff;color:#0e4d63;font-size:17px;font-weight:900;cursor:pointer;transition:transform .07s ease;}
+  .gbtn.on{background:#2e9e5b;color:#fff;border-color:#2e9e5b;}
+  .gbtn:active{transform:scale(.9);}
+  .ov button{margin-top:16px;background:#2e9e5b;color:#fff;border:none;border-radius:14px;padding:13px 38px;font-size:18px;font-weight:900;}
+  .codebox{background:#fff;color:#0e3a4a;border-radius:16px;padding:13px 26px;margin:14px 0 4px;font-size:16px;font-weight:800;text-align:center;}
+  .codebox b{font-size:32px;letter-spacing:5px;color:#0e7c7c;display:block;margin-top:4px;}
+  .codebox .cbsub{font-size:12px;font-weight:700;color:#7a8794;margin-top:6px;}
+  .codebox.warn{background:#fff4e8;color:#a35a12;}
+  #app button{transition:transform .07s ease, filter .07s ease, box-shadow .12s ease;}
+  #app button:active{filter:brightness(1.12);}
+  @keyframes tappop{0%{transform:scale(1);}32%{transform:scale(.82);}66%{transform:scale(1.07);}100%{transform:scale(1);}}
+  button.tapped{animation:tappop .28s ease;box-shadow:0 0 0 4px rgba(255,210,74,.55),0 0 14px 3px rgba(255,210,74,.5)!important;}
+  .goodpop{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:60;pointer-events:none;font-family:'Arial Black','Arial',sans-serif;font-weight:900;font-style:italic;font-size:88px;letter-spacing:2px;color:#ffe14a;-webkit-text-stroke:5px #c4281c;text-shadow:0 6px 0 #7a0f0a,0 0 20px rgba(255,210,74,.85);white-space:nowrap;animation:goodpop 1.15s cubic-bezier(.2,1.5,.4,1) forwards;}
+  @keyframes goodpop{0%{transform:translate(-50%,-50%) scale(.2) rotate(-12deg);opacity:0;}18%{transform:translate(-50%,-50%) scale(1.3) rotate(7deg);opacity:1;}34%{transform:translate(-50%,-50%) scale(.98) rotate(-3deg);}50%{transform:translate(-50%,-50%) scale(1.06) rotate(1deg);}72%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1;}100%{transform:translate(-50%,-50%) scale(.12) rotate(0);opacity:0;}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="statusbar">
+    <div class="ttl"><button class="homebtn" onclick="goHome()">&#8962; Home</button>&#128032; Reef Rescue &middot; Balance the Tanks</div>
+    <div><span class="pill">Level <b id="lvlnum">1</b> / 20</span><span class="pill"><span id="starIcon" class="staricon">&#9733;</span> <b id="scoreNum">0</b></span></div>
+  </div>
+  <div class="wrap" id="game"></div>
+  <div class="ov" id="overlay"></div>
+</div>
+<script>
+"use strict";
+/* per-group completion code */
+var GAME_ID=3;var NUM_GROUPS=5;var CODE_ABC="23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+function codeFor(g,game){var n=((g*131+game*457+89)*2099)%1048576;return CODE_ABC[(n>>15)&31]+CODE_ABC[(n>>10)&31]+CODE_ABC[(n>>5)&31]+CODE_ABC[n&31];}
+
+/* species: bigger fish drawn larger AND wanted in smaller numbers */
+function svgw(inner,s){return '<svg width="'+s+'" height="'+(s*0.62)+'" viewBox="0 0 100 62">'+inner+'</svg>';}
+function spShark(s){return svgw(
+ '<path d="M4 31 C24 13 58 15 76 23 L96 10 L88 31 L96 52 L76 39 C58 47 24 49 4 31 Z" fill="#7e8b99"/>'+
+ '<path d="M44 17 L53 2 L61 19 Z" fill="#65737f"/>'+
+ '<path d="M40 41 L45 54 L52 42 Z" fill="#65737f"/>'+
+ '<path d="M4 33 q10 5 20 2" stroke="#37454f" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
+ '<circle cx="22" cy="26" r="3" fill="#15303a"/>'+
+ '<path d="M32 23 q-3 8 0 16 M38 23 q-3 8 0 16" stroke="#65737f" stroke-width="1.8" fill="none"/>',s);}
+function spGold(s){return svgw(
+ '<path d="M55 31 q20 -18 32 -10 q-9 10 0 20 q-12 8 -32 -10 Z" fill="#eb9b12"/>'+
+ '<circle cx="38" cy="31" r="23" fill="#ffb01f"/>'+
+ '<path d="M30 10 q8 -7 17 -1 q-3 6 -9 8 Z" fill="#eb9b12"/>'+
+ '<circle cx="28" cy="26" r="4.6" fill="#fff"/><circle cx="27" cy="26" r="2.4" fill="#15303a"/>'+
+ '<path d="M15 34 q7 4 13 1" stroke="#c77f12" stroke-width="2" fill="none" stroke-linecap="round"/>',s);}
+function spAngel(s){return svgw(
+ '<ellipse cx="42" cy="31" rx="17" ry="25" fill="#e0556a"/>'+
+ '<path d="M30 8 L42 31 L30 8 M30 54 L42 31 L30 54" stroke="#c23b50" stroke-width="3" fill="none"/>'+
+ '<path d="M59 31 L78 22 L72 31 L78 40 Z" fill="#c23b50"/>'+
+ '<rect x="36" y="10" width="3.5" height="42" rx="1.5" fill="rgba(255,255,255,.45)"/>'+
+ '<rect x="46" y="13" width="3.2" height="36" rx="1.5" fill="rgba(255,255,255,.32)"/>'+
+ '<circle cx="34" cy="25" r="4" fill="#fff"/><circle cx="33" cy="25" r="2.1" fill="#15303a"/>',s);}
+function spTetra(s){return svgw(
+ '<ellipse cx="40" cy="31" rx="24" ry="14" fill="#2e9e5b"/>'+
+ '<path d="M60 31 L84 19 L76 31 L84 43 Z" fill="#1f7a43"/>'+
+ '<rect x="20" y="25" width="32" height="4" rx="2" fill="rgba(255,255,255,.4)"/>'+
+ '<circle cx="28" cy="27" r="4" fill="#fff"/><circle cx="27" cy="27" r="2.1" fill="#15303a"/>',s);}
+// ordered biggest -> smallest; biggest (Shark) always gets the SMALLEST count
+var POOL=[{n:"Shark",c:"#7e8b99",sz:58,draw:spShark},
+          {n:"Angelfish",c:"#e0556a",sz:46,draw:spAngel},
+          {n:"Goldfish",c:"#ffb01f",sz:40,draw:spGold},
+          {n:"Tetra",c:"#2e9e5b",sz:32,draw:spTetra}];
+var ZONES=["Coral Cove","Kelp Forest","Blue Lagoon","Deep Reef","Turtle Bay","Pearl Reef"];
+var ZONE_TARGET=4;
+var MAXLEVEL=20;
+var ASKS=["Both tanks are messy! Drag fish so EACH tank has the healthy ratio.",
+          "Balance both tanks &mdash; big fish need more room, so keep fewer of them!",
+          "Share the fish: drag them so each tank matches the healthy ratio.",
+          "Sort the fish &mdash; each tank should show the same healthy ratio."];
+
+function fish(s,color){return ('<svg width="'+s+'" height="'+(s*0.62)+'" viewBox="0 0 100 62">'
+ +'<ellipse cx="42" cy="31" rx="30" ry="18" fill="'+color+'"/>'
+ +'<path d="M68 31 L92 14 L92 48 Z" fill="'+color+'"/>'
+ +'<circle cx="30" cy="25" r="4.5" fill="#fff"/><circle cx="29" cy="25" r="2.2" fill="#15303a"/>'
+ +'<path d="M50 20 q10 -7 18 0" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3" stroke-linecap="round"/></svg>');}
+
+var S={level:1,score:0,reef:0,zone:0,t:300,rt:50,rtMax:50,sp:[],fish:[],target:[],tanks:2,perTank:false,tankRatio:[],ratio:null,locked:false,timer:null,ask:"",hint:0};
+function $(id){return document.getElementById(id);}
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=rnd(0,i),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function gcd(a,b){return b===0?a:gcd(b,a%b);}
+function gcdArr(a){return a.reduce(function(x,y){return gcd(x,y);});}
+
+/* sound */
+var actx=null;
+function ensureAudio(){try{if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();}catch(e){}}
+function playDing(){ensureAudio();if(!actx)return;try{var t=actx.currentTime;[659.25,783.99,1046.5,1318.5].forEach(function(f,i){var o=actx.createOscillator(),g=actx.createGain();o.type='triangle';o.frequency.value=f;o.connect(g);g.connect(actx.destination);var st=t+i*0.085;g.gain.setValueAtTime(0.0001,st);g.gain.exponentialRampToValueAtTime(0.28,st+0.02);g.gain.exponentialRampToValueAtTime(0.0001,st+0.22);o.start(st);o.stop(st+0.25);});}catch(e){}}
+function buzz(){ensureAudio();if(!actx)return;try{var t=actx.currentTime;var o=actx.createOscillator(),g=actx.createGain();o.type='sawtooth';o.frequency.setValueAtTime(220,t);o.frequency.exponentialRampToValueAtTime(110,t+0.4);o.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.2,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.45);o.start(t);o.stop(t+0.5);}catch(e){}}
+function popStar(){var s=$('starIcon');if(!s)return;s.classList.remove('pop');void s.offsetWidth;s.classList.add('pop');}
+
+/* start screen */
+function miniTank(list,w){var f='';list.forEach(function(o,i){f+='<g transform="translate('+(12+ (i%4)*23)+','+(16+Math.floor(i/4)*24)+') scale('+(o.b?0.4:0.3)+')">'+fish(40,o.c)+'</g>';});
+ return '<svg width="'+w+'" height="60" viewBox="0 0 110 70"><rect x="4" y="6" width="102" height="58" rx="8" fill="#bdeaf5" stroke="#2f8fa8" stroke-width="4"/>'+f+'</svg>';}
+function handIco(){return '<svg width="80" height="60" viewBox="0 0 100 80"><g transform="translate(8,20) scale(0.32)">'+fish(40,'#ff9f1c')+'</g>'
+ +'<path d="M52 30 q14 -6 26 2 q6 4 6 12 v14 q0 8 -8 8 h-18 q-8 0 -10 -8 l-4 -16 q-1 -6 8 -6 Z" fill="#ffd9b3" stroke="#e0b48a" stroke-width="2"/></svg>';}
+function showStart(){
+ $('overlay').classList.remove('hide');
+ var messy=[{c:'#e0556a',b:1},{c:'#e0556a',b:1},{c:'#3a8fd6'},{c:'#3a8fd6'},{c:'#3a8fd6'}];
+ var tidy=[{c:'#e0556a',b:1},{c:'#3a8fd6'},{c:'#3a8fd6'}];
+ $('overlay').innerHTML='<div class="startcard">'
+  +'<div class="ttl">&#128032; Reef Rescue &mdash; Balance the Tanks</div>'
+  +'<div class="flow">'
+   +'<div class="stepc">'+miniTank(messy,104)+'<div class="tx">Tanks are<br>unbalanced</div></div>'
+   +'<div class="arr">&#8594;</div>'
+   +'<div class="stepc">'+handIco()+'<div class="tx">Drag fish to<br>the other tank</div></div>'
+   +'<div class="arr">&#8594;</div>'
+   +'<div class="stepc">'+miniTank(tidy,104)+'<div class="tx">Each tank =<br><b>healthy ratio</b></div></div>'
+  +'</div>'
+  +'<p style="text-align:center;font-size:14px;font-weight:800;color:#0e4d63;margin:4px 0 0">Big fish need more room &mdash; so keep <b>fewer big</b>, <b>more small</b>. Balance &ne; equal numbers!</p>'
+  +'<div class="hintline"><span>&#9201; beat the timer</span><span>&#128101; team up</span></div>'
+  +'<button onclick="startGame()">Play</button>'
+ +'</div>';
+}
+function goHome(){if(S.timer)clearInterval(S.timer);clearAnswer();showStart();}
+
+function startGame(){ensureAudio();clearAnswer();S.level=1;S.score=0;S.reef=0;S.zone=0;
+ $('overlay').classList.add('hide');
+ if(S.timer)clearInterval(S.timer);S.timer=setInterval(tick,1000);newOrder();}
+function tick(){if(!S.locked){S.rt--;upRound();if(S.rt<=0)roundTimeout();}}
+function band(){return S.level<=5?'EASY':S.level<=14?'MEDIUM':S.level<=17?'HARD':'EXTREME';}
+function upRound(){var b=$('rbar'),sec=$('rsec');if(!b)return;var p=Math.max(0,S.rt/S.rtMax*100);b.style.width=p+'%';
+ b.style.background=S.rt<=8?'#e0556a':S.rt<=18?'#f0a93c':'#2e9e5b';
+ if(sec){var rr=Math.max(0,S.rt),m=Math.floor(rr/60),s=rr%60;sec.textContent=m+":"+(s<10?"0":"")+s;}}
+
+function tier(){
+ if(S.level<=5)return {tanks:2,species:2};       // EASY: learn ratio; scaling introduced at L5
+ if(S.level<=6)return {tanks:2,species:3};        // 3 kinds
+ if(S.level<=14)return {tanks:3,species:3};       // 3 tanks, 3 kinds, shared ratio (gentler for F.1)
+ return {tanks:3,species:2,perTank:true};         // L15+: each tank its OWN ratio (extreme at L18+)
+}
+// scaling: counts = ratio x m. m=1 before L5 (learn the ratio), then >1 (test "scale up").
+function chooseM(sumR,tanks){
+ var m=(S.level<5)?1:(2+Math.floor((S.level-5)/4));
+ while(m>1 && sumR*m*tanks>28) m--;
+ return m;
+}
+function countIn(tank,si){var c=0;for(var i=0;i<S.fish.length;i++){if(S.fish[i].tank===tank&&S.fish[i].sp===si)c++;}return c;}
+function simp(a){var g=gcdArr(a);return g===0?a:a.map(function(v){return v/g;});}
+function ratioMatch(counts,ratio){var s=0;for(var i=0;i<counts.length;i++)s+=counts[i];if(s===0)return false;var a=simp(counts),b=simp(ratio);for(var i=0;i<a.length;i++)if(a[i]!==b[i])return false;return true;}
+function roundBudget(total){
+ if(S.level<=5)return Math.max(20,Math.min(32,Math.round(14+total*1.6))); // EASY: short
+ if(S.level<=14)return Math.max(45,Math.min(60,Math.round(34+total*2)));  // MEDIUM: 45-60s
+ return Math.max(60,Math.min(85,Math.round(48+total*2.4)));               // HARD/EXTREME: more time (60-85s)
+}
+
+function newOrder(){
+ var ti=tier();var nT=ti.tanks,nS=ti.species;S.tanks=nT;S.perTank=!!ti.perTank;
+ var sp=shuffle(POOL.slice()).slice(0,nS);
+ sp.sort(function(a,b){return b.sz-a.sz;});           // big -> small
+ S.sp=sp.map(function(s,i){return {n:s.n,c:s.c,sz:s.sz,r:i+1,draw:s.draw};});
+ S.target=[];S.tankRatio=[];S.ratio=null;S.scale=1;
+ if(!S.perTank){
+   var r=S.sp.map(function(_,i){return i+1;});var g=gcdArr(r);r=r.map(function(v){return v/g;});
+   var sumR=r.reduce(function(x,y){return x+y;},0);
+   var m=chooseM(sumR,nT);S.ratio=r;S.scale=m;
+   for(var t=0;t<nT;t++){S.target.push(r.map(function(v){return v*m;}));S.tankRatio.push(r.slice());}
+ } else {
+   var hi=(S.level>=18)?4:3, mtMax=(S.level>=18)?3:2, used={};
+   for(var t=0;t<nT;t++){
+     var a,b,key,tr=0;
+     do{a=rnd(1,hi);b=rnd(1,hi);var gg=gcd(a,b);a=a/gg;b=b/gg;key=Math.min(a,b)+':'+Math.max(a,b);tr++;}while(used[key]&&tr<25);
+     used[key]=1;var lo=Math.min(a,b),hg=Math.max(a,b);   // bigger fish (sp0) gets the smaller count
+     var mt=rnd(1,mtMax);if((lo+hg)*mt>9)mt=Math.max(1,Math.floor(9/(lo+hg)));
+     S.tankRatio.push([lo,hg]);S.target.push([lo*mt,hg*mt]);
+   }
+ }
+ // build fish: total per species = sum over tanks of target
+ S.fish=[];var id=0;
+ for(var i=0;i<nS;i++){var tot=0;for(var t=0;t<nT;t++)tot+=S.target[t][i];for(var j=0;j<tot;j++)S.fish.push({id:id++,sp:i,tank:0});}
+ // scramble across the tanks; not already balanced and clearly messy
+ var tries=0;
+ do{ S.fish.forEach(function(f){f.tank=rnd(0,nT-1);}); tries++; }
+ while((isBalanced()||misplaced()<4)&&tries<90);
+ S.locked=false;S.hint=0;
+ S.ask=S.perTank?"Each tank wants its OWN ratio — drag fish so every tank matches its label!":ASKS[rnd(0,ASKS.length-1)];
+ S.rtMax=roundBudget(S.fish.length);S.rt=S.rtMax;
+ render();upRound();
+}
+function hardestTank(){var bi=0,bs=-1;for(var t=0;t<S.tanks;t++){var s=0,mx=0;for(var i=0;i<S.sp.length;i++){s+=S.target[t][i];if(S.target[t][i]>mx)mx=S.target[t][i];}var score=s*10+mx;if(score>bs){bs=score;bi=t;}}return bi;}
+function tankOK(t){var c=[];for(var i=0;i<S.sp.length;i++)c.push(countIn(t,i));return ratioMatch(c,S.tankRatio[t]);}
+function isBalanced(){for(var t=0;t<S.tanks;t++){if(!tankOK(t))return false;}return true;}
+function misplaced(){var m=0;for(var t=0;t<S.tanks;t++){for(var i=0;i<S.sp.length;i++){m+=Math.abs(countIn(t,i)-S.target[t][i]);}}return m;}
+// place every fish into a correct arrangement (used to reveal the answer on time-out)
+function solveLayout(){
+ for(var i=0;i<S.sp.length;i++){
+   var pool=[];for(var k=0;k<S.fish.length;k++)if(S.fish[k].sp===i)pool.push(S.fish[k]);
+   var idx=0;
+   for(var t=0;t<S.tanks;t++){for(var c=0;c<S.target[t][i];c++){if(idx<pool.length)pool[idx++].tank=t;}}
+ }
+}
+
+function render(){
+ var chartHTML;
+ if(S.perTank){
+   chartHTML='<div class="chart alt"><div class="cl">EACH TANK = ITS OWN RATIO</div><div class="cv2">match every tank&rsquo;s label &#8594;</div></div>';
+ } else {
+   var chart='';
+   for(var i=0;i<S.sp.length;i++){chart+=(i?'<span class="sep">:</span>':'')+'<span class="grp">'+S.sp[i].draw(20)+'<b style="color:'+S.sp[i].c+'">'+S.sp[i].r+'</b></span>';}
+   chartHTML='<div class="chart"><div class="cl">HEALTHY RATIO (each tank)</div><div class="cv">'+chart+'</div></div>';
+ }
+ var legend='';
+ for(var i=0;i<S.sp.length;i++){legend+='<span>'+S.sp[i].draw(Math.max(20,S.sp[i].sz*0.52))+S.sp[i].n+'</span>';}
+ var zoneName=ZONES[Math.min(S.zone,ZONES.length-1)];
+ var rp=Math.max(0,Math.min(100,(S.reef-S.zone*ZONE_TARGET)/ZONE_TARGET*100));
+ var tanksHTML='';for(var t=0;t<S.tanks;t++)tanksHTML+=tankHTML(t);
+ var bd=band(),bcol=bd==='EXTREME'?'#e0556a':bd==='HARD'?'#ff8a3c':bd==='MEDIUM'?'#2f7eb5':'#2e9e5b';
+ $('game').innerHTML=
+   '<div class="task">'+
+     '<div class="bubble"><div class="hi">&#128032; Tank keeper <span class="bandtag" style="background:'+bcol+'">'+bd+'</span></div><div class="ms">'+S.ask+'</div></div>'+
+     chartHTML+
+   '</div>'+
+   '<div class="rtimer"><span class="lab">&#9201; This round:</span><div class="rbarwrap"><div class="rbar" id="rbar"></div></div><span class="rsec" id="rsec">0:00</span></div>'+
+   '<div class="tanks">'+tanksHTML+'</div>'+
+   '<div class="fb" id="fb">Drag fish so EVERY tank matches its ratio. A tank can hold a bigger amount &mdash; same ratio!</div>'+
+   '<div class="foot"><button class="hintbtn" onclick="toggleHint()">&#128161; Hint</button><div class="legend">'+legend+'</div>'+
+     '<div class="reef"><div class="t"><span>&#127756; Restore the reef &rarr; '+zoneName+'</span><span>'+(S.reef-S.zone*ZONE_TARGET)+' / '+ZONE_TARGET+' tanks</span></div>'+
+       '<div class="reefbarwrap"><div class="reefbar" style="width:'+rp+'%"></div></div></div></div>';
+ var ln=$('lvlnum');ln.textContent=S.level;var lc=levelColor(S.level);ln.style.color=lc;ln.style.textShadow=S.level>=5?('0 0 9px '+lc):'none';
+ $('scoreNum').textContent=S.score;
+}
+function tankHTML(t){
+ var inner='';
+ for(var sp=0;sp<S.sp.length;sp++){
+   var col='';
+   for(var k=0;k<S.fish.length;k++){var f=S.fish[k];if(f.tank!==t||f.sp!==sp)continue;
+     col+='<span class="fishw" data-id="'+f.id+'" onpointerdown="fishDown(event,'+f.id+')" ontouchstart="fishDown(event,'+f.id+')">'+S.sp[sp].draw(S.sp[sp].sz)+'</span>';}
+   inner+='<div class="spcol">'+col+'</div>';
+ }
+ var ok=tankOK(t);var letter=String.fromCharCode(65+t);
+ var reqRow='';
+ if(S.perTank){var tr=S.tankRatio[t];
+   reqRow='<div class="reqbox">wants <span class="ratiobox"><b style="color:'+S.sp[0].c+'">'+tr[0]+'</b><span class="rc">:</span><b style="color:'+S.sp[1].c+'">'+tr[1]+'</b></span></div>';}
+ var hintRow='';
+ if(S.hint && t===hardestTank()){var hh='';for(var hi=0;hi<S.sp.length;hi++){hh+='<span style="display:inline-flex;align-items:center;gap:1px">'+S.sp[hi].draw(15)+'&times;<b>'+S.target[t][hi]+'</b></span>';}
+   hintRow='<div class="hintrow">&#128161; toughest tank &mdash; needs '+hh+'</div>';}
+ return '<div class="tankcol"><div class="tankhdr"><span>Tank '+letter+'</span>'+
+   '<span class="ok '+(ok?'yes':'no')+'">'+(ok?'&#10003;':'&hellip;')+'</span></div>'+
+   reqRow+hintRow+
+   '<div class="tank'+(ok?' hot':'')+'" id="tank'+t+'">'+inner+'<div class="sand"></div></div></div>';
+}
+var LVCOL=['#9fb6c9','#4ab8d6','#27b56e','#f2c200','#ff9a1f','#ff6a2c','#ff2e6e','#d126d3','#7c3aed'];
+function levelColor(lv){return LVCOL[Math.min(lv-1,LVCOL.length-1)];}
+function toggleHint(){if(S.locked)return;S.hint=S.hint?0:1;render();upRound();}
+function flash(m,c){var e=$('fb');if(e){e.textContent=m;e.className='fb '+(c==='ok'?'ok':c==='no'?'no':'');}}
+
+/* ---- drag and drop (pointer + touch) ---- */
+var DRAG={on:false,id:-1,clone:null};
+function ptr(e){return (e.touches&&e.touches[0])?e.touches[0]:((e.changedTouches&&e.changedTouches[0])?e.changedTouches[0]:e);}
+function fishDown(e,id){
+ if(S.locked||DRAG.on)return;
+ var f=null;for(var i=0;i<S.fish.length;i++)if(S.fish[i].id===id){f=S.fish[i];break;}
+ if(!f)return;var s=S.sp[f.sp];var p=ptr(e);
+ DRAG.on=true;DRAG.id=id;
+ var c=document.createElement('div');c.className='dragclone';c.innerHTML=s.draw(s.sz+6);
+ document.body.appendChild(c);DRAG.clone=c;moveClone(p);
+ if(e.preventDefault)e.preventDefault();
+}
+function moveClone(p){if(DRAG.clone){DRAG.clone.style.left=p.clientX+'px';DRAG.clone.style.top=p.clientY+'px';}}
+function dragMove(e){if(!DRAG.on)return;moveClone(ptr(e));if(e.cancelable&&e.preventDefault)e.preventDefault();}
+function inRect(p,r){return r&&p.clientX>=r.left&&p.clientX<=r.right&&p.clientY>=r.top&&p.clientY<=r.bottom;}
+function dragEnd(e){
+ if(!DRAG.on)return;var p=ptr(e);
+ var f=null;for(var i=0;i<S.fish.length;i++)if(S.fish[i].id===DRAG.id){f=S.fish[i];break;}
+ if(f){ for(var t=0;t<S.tanks;t++){var el=$('tank'+t);if(el&&inRect(p,el.getBoundingClientRect())){if(f.tank!==t)f.tank=t;break;}} }
+ if(DRAG.clone){DRAG.clone.remove();DRAG.clone=null;}
+ DRAG.on=false;DRAG.id=-1;
+ render();upRound();checkBalance();
+}
+window.addEventListener('pointermove',dragMove,{passive:false});
+window.addEventListener('pointerup',dragEnd);
+window.addEventListener('touchmove',dragMove,{passive:false});
+window.addEventListener('touchend',dragEnd);
+
+function checkBalance(){
+ if(S.locked)return;
+ if(isBalanced()){
+   S.locked=true;var pts=10*S.level;S.score+=pts;S.reef++;$('scoreNum').textContent=S.score;
+   playDing();popStar();goodPop('GOOD!!');
+   var arrived=(S.reef>=(S.zone+1)*ZONE_TARGET)&&(S.zone<ZONES.length-1);
+   if(arrived)S.zone++;
+   render();
+   var last=(S.level>=MAXLEVEL);
+   flash('All tanks balanced! +'+pts+(arrived?(' · 🌊 '+ZONES[S.zone]+' restored!'):''),'ok');
+   if(arrived)setTimeout(function(){bigFeed('🌊');},500);
+   S.level++;
+   setTimeout(function(){if(last){endGame(true);}else{newOrder();}},1500);
+ }
+}
+var ansTimer=null;
+function answerTank(t){
+ var cols='';
+ for(var i=0;i<S.sp.length;i++){
+   var col='';for(var k=0;k<S.target[t][i];k++)col+=S.sp[i].draw(Math.min(S.sp[i].sz,36));
+   cols+='<div class="mspcol">'+col+'</div>';
+ }
+ return '<div class="mtank">'+cols+'<div class="sand"></div></div>';
+}
+function clearAnswer(){if(ansTimer){clearInterval(ansTimer);ansTimer=null;}var b=document.getElementById('ansbox');if(b)b.remove();}
+function showAnswer(){
+ var rows='';
+ for(var t=0;t<S.tanks;t++){
+   var letter=String.fromCharCode(65+t);
+   var rl='';
+   if(S.perTank){var tr=S.tankRatio[t];rl='<span class="ratiobox" style="font-size:13px;padding:1px 8px"><b style="color:'+S.sp[0].c+'">'+tr[0]+'</b><span class="rc">:</span><b style="color:'+S.sp[1].c+'">'+tr[1]+'</b></span>';}
+   rows+='<div class="ansrow"><div class="ansname">Tank '+letter+' '+rl+'</div>'+answerTank(t)+'</div>';
+ }
+ var box=document.createElement('div');box.className='ansmodal';box.id='ansbox';
+ box.innerHTML='<div class="anscard"><div class="anshd">&#9201; Time&#39;s up — the correct answer</div>'+
+   '<div class="anssub">Compare with your tanks behind. Which tank went wrong, and by how many?</div>'+
+   '<div class="ansrows">'+rows+'</div>'+
+   '<div class="ansfoot"><span id="anscount">Auto next in 30s</span><button onclick="closeAnswer()">Next &#8594;</button></div></div>';
+ $('app').appendChild(box);
+ var left=30;
+ if(ansTimer)clearInterval(ansTimer);
+ ansTimer=setInterval(function(){left--;var c=document.getElementById('anscount');if(c)c.textContent='Auto next in '+left+'s';if(left<=0){closeAnswer();}},1000);
+}
+function closeAnswer(){clearAnswer();newOrder();}
+function roundTimeout(){S.locked=true;buzz();showAnswer();}
+function goodPop(t){var d=document.createElement('div');d.className='goodpop';d.textContent=t||'GOOD!!';$('app').appendChild(d);setTimeout(function(){d.remove();},1200);}
+function bigFeed(e){var d=document.createElement('div');d.textContent=e;d.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:104px;z-index:35;pointer-events:none;';$('app').appendChild(d);setTimeout(function(){d.remove();},1200);}
+function endGame(win){if(S.timer)clearInterval(S.timer);clearAnswer();if(DRAG.clone){DRAG.clone.remove();DRAG.clone=null;}DRAG.on=false;$('overlay').classList.remove('hide');
+ var head=win?'<div class="big">&#127942;&#128032;&#127754;</div><h1>You cleared all 20 tanks!</h1>':'<div class="big">&#128032;&#127754;</div><h1>Nice work!</h1>';
+ $('overlay').innerHTML=head+'<p>Final score:</p>'+
+ '<div style="font-size:54px;font-weight:900;color:#ffd24a">&#9733; '+S.score+'</div>'+
+ '<p>You balanced <b>'+S.reef+'</b> tanks &mdash; reef zone <b>'+ZONES[Math.min(S.zone,ZONES.length-1)]+'</b>.</p>'+
+ '<button onclick="goHome()">Home</button>';}
+/* ---- bubble press sound + tap animation on every button ---- */
+function bubbleSnd(){ensureAudio();if(!actx)return;try{var t=actx.currentTime;var o=actx.createOscillator(),g=actx.createGain(),f=actx.createBiquadFilter();o.type='sine';o.frequency.setValueAtTime(380,t);o.frequency.exponentialRampToValueAtTime(940,t+0.08);o.frequency.exponentialRampToValueAtTime(560,t+0.17);f.type='lowpass';f.frequency.value=1800;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.30,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.19);o.connect(f);f.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+0.2);}catch(e){}}
+document.addEventListener('pointerdown',function(e){var b=e.target&&e.target.closest?e.target.closest('button'):null;if(!b)return;bubbleSnd();b.classList.remove('tapped');void b.offsetWidth;b.classList.add('tapped');setTimeout(function(){b.classList.remove('tapped');},300);},true);
+showStart();
+</script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Smoothie Bar - Simple</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:-apple-system,"Helvetica Neue",Arial,sans-serif;}
+  html,body{margin:0;height:100%;}
+  body{background:#10212f;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#1f2933;}
+  #app{width:100%;height:100%;max-width:1100px;max-height:840px;background:#f4f7fb;position:relative;display:flex;flex-direction:column;}
+  .hide{display:none!important;}
+  .bar{display:flex;align-items:center;justify-content:space-between;background:#13395c;color:#fff;padding:9px 16px;font-weight:800;font-size:15px;}
+  .bar .l{display:flex;gap:10px;align-items:center;}
+  .bar .r{display:flex;gap:8px;align-items:center;}
+  .homebtn{background:#fff;color:#13395c;border:none;border-radius:10px;padding:6px 12px;font-size:13px;font-weight:800;cursor:pointer;}
+  .homebtn:active{transform:scale(.93);}
+  .bar .pill{background:#1f5081;border-radius:18px;padding:4px 12px;}
+  .bar .time.warn{color:#ffd24a;}
+  .wrap{flex:1;display:flex;flex-direction:column;padding:16px 20px;min-height:0;}
+  /* order line */
+  .order{display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;padding:12px 18px;box-shadow:0 2px 10px rgba(20,60,100,.08);}
+  .order .av{flex:0 0 auto;}
+  .order .txt{font-size:23px;font-weight:800;color:#13395c;line-height:1.3;}
+  .order .txt .hl{color:#d8602f;}
+  .order .txt .small{display:block;font-size:13px;font-weight:700;color:#9aa6b2;margin-top:2px;}
+  /* progress */
+  .prog{margin:16px 0 6px;}
+  .ptrack{height:24px;background:#e3e9f0;border-radius:13px;overflow:hidden;display:flex;}
+  .ptrack .seg{height:100%;}
+  .plabel{text-align:center;font-size:15px;font-weight:800;color:#13395c;margin-top:6px;}
+  /* tiles */
+  .tiles{display:flex;gap:14px;flex:1;min-height:0;margin-top:6px;}
+  .tile{flex:1;background:#fff;border-radius:16px;box-shadow:0 2px 10px rgba(20,60,100,.08);display:flex;flex-direction:column;align-items:center;padding-bottom:14px;overflow:hidden;}
+  .tile .cap{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px;font-weight:800;font-size:16px;color:#fff;}
+  .tile .val{font-size:46px;font-weight:900;color:#13395c;margin:14px 0 2px;line-height:1;}
+  .tile .val .u{font-size:17px;color:#7a8794;margin-left:2px;}
+  .tile .btns{display:flex;gap:12px;margin-top:auto;}
+  .tile .btns button{border:none;border-radius:14px;color:#fff;font-size:18px;font-weight:900;padding:14px 16px;}
+  .tile .minus{background:#c2ccd6;}
+  .tile .btns button:active{transform:scale(.9);}
+  /* press feedback: bounce + glow on every button */
+  #app button{transition:transform .07s ease, filter .07s ease, box-shadow .12s ease;}
+  #app button:active{filter:brightness(1.12);}
+  @keyframes tappop{0%{transform:scale(1);}32%{transform:scale(.82);}66%{transform:scale(1.07);}100%{transform:scale(1);}}
+  button.tapped{animation:tappop .28s ease;box-shadow:0 0 0 4px rgba(255,210,74,.55),0 0 14px 3px rgba(255,210,74,.5)!important;}
+  /* footer */
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;}
+  .calcbtn{background:#e7edf4;color:#13395c;border:none;border-radius:13px;padding:13px 18px;font-size:15px;font-weight:800;}
+  .fb{flex:1;text-align:center;font-size:17px;font-weight:800;min-height:22px;}
+  .fb.ok{color:#1f8a4c;} .fb.no{color:#c0392b;}
+  .hintbox{background:#fff7e6;border:2px solid #f0c98a;border-radius:13px;padding:9px 14px;margin-top:12px;font-size:14px;font-weight:700;color:#8a5a12;line-height:1.4;}
+  .hintbox b{color:#b5651d;}
+  .hintbox .hrow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:7px 0;}
+  .hintbox .hrow + .hrow{border-top:1px dashed #ecd0a0;padding-top:7px;}
+  .hintbox .hl{font-weight:900;color:#b5651d;font-size:13px;background:#ffe9c2;border-radius:8px;padding:2px 9px;}
+  .hintbox .hnote{font-size:12.5px;color:#8a5a12;font-weight:700;}
+  .hintbox .tag{background:#fff;border:2px solid #e0b46a;border-radius:9px;padding:2px 9px;font-weight:900;color:#a35a12;font-size:13.5px;}
+  .hintbox .harr{font-weight:900;color:#5f6b76;font-size:16px;}
+  .hintbox .pgrp{display:inline-flex;align-items:center;gap:2px;}
+  .hintbox .pblk{display:inline-block;width:16px;height:16px;border-radius:3px;border:1px solid rgba(0,0,0,.18);}
+  .hintbox .plus{font-weight:900;color:#b08a4a;font-size:14px;margin:0 1px;}
+  .hintbox .pchip{display:inline-block;border-radius:8px;padding:2px 8px;color:#fff;font-weight:900;font-size:12px;}
+  .hintbtn{background:#fde7c0;color:#8a5a12;border:none;border-radius:13px;padding:13px 18px;font-size:15px;font-weight:800;}
+  .hintbtn:active{transform:scale(.95);}
+  .serve{background:#2e9e5b;color:#fff;border:none;font-size:22px;font-weight:900;border-radius:14px;padding:14px 52px;}
+  .serve:active{transform:scale(.97);}
+  /* calculator */
+  .calc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:280px;background:#0f2435;border-radius:18px;padding:14px;z-index:30;box-shadow:0 14px 40px rgba(0,0,0,.5);}
+  .calc .disp{background:#cfe6d6;color:#10331f;border-radius:10px;text-align:right;font-size:30px;font-weight:900;padding:10px 14px;margin-bottom:10px;}
+  .calc .ks{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;}
+  .calc .k{border:none;border-radius:12px;padding:15px 0;font-size:20px;font-weight:800;background:#e9eef3;color:#13395c;}
+  .calc .k:active{transform:scale(.92);}
+  .calc .op{background:#f0a93c;color:#fff;} .calc .eq{background:#2e9e5b;color:#fff;} .calc .clr{background:#e0556a;color:#fff;}
+  .calc .close{position:absolute;top:-13px;right:-13px;width:34px;height:34px;border-radius:50%;background:#e0556a;color:#fff;border:none;font-size:18px;font-weight:900;}
+  .ov{position:absolute;inset:0;background:rgba(16,33,47,.95);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px;z-index:40;}
+  .ov h1{font-size:32px;margin:6px 0;} .ov p{font-size:16px;max-width:640px;line-height:1.6;opacity:.95;}
+  .ov .big{font-size:54px;} .ov button{margin-top:14px;background:#2e9e5b;color:#fff;border:none;border-radius:14px;padding:14px 40px;font-size:19px;font-weight:900;}
+  .ov .ttl{font-size:30px;font-weight:900;margin:0 0 2px;}
+  .ov .flow{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin:14px 0 6px;}
+  .ov .stepc{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.28);border-radius:16px;padding:9px 8px;width:150px;}
+  .ov .stepc .ic{height:56px;display:flex;align-items:center;justify-content:center;margin-bottom:5px;}
+  .ov .stepc .tx{font-size:13px;font-weight:800;line-height:1.25;}
+  .ov .stepc .tx b{color:#ffd24a;}
+  .ov .arr{font-size:24px;color:#9fb6c9;font-weight:900;}
+  .ov .legend2{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:740px;margin:8px 0 2px;}
+  .ov .blg{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:11px;padding:6px 11px;font-size:13px;font-weight:700;}
+  .ov .kbtn{border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:900;padding:5px 9px;display:inline-block;}
+  .ov .intro{font-size:15px;max-width:620px;line-height:1.55;opacity:.96;margin:4px auto 2px;}
+  .ov .intro b{color:#ffd24a;}
+  .ov .sct{font-size:12px;font-weight:900;color:#9fd0ff;letter-spacing:1.5px;margin:13px 0 1px;}
+  .ov .cO{color:#ffb347;} .ov .cR{color:#ff7a9c;} .ov .cG{color:#6ee787;} .ov .cB{color:#7ec8ff;} .ov .cY{color:#ffd24a;} .ov .cP{color:#c9a0ff;}
+  .ov .blg{color:#eaf2fb;}
+  .grouprow{display:flex;align-items:center;justify-content:center;gap:7px;margin:16px 0 2px;}
+  .grouprow .gl{font-size:16px;font-weight:900;color:#fff;margin-right:3px;}
+  .grouprow.warn .gl{color:#ff9b9b;}
+  .gbtn{width:42px;height:42px;border-radius:11px;border:2px solid rgba(255,255,255,.5);background:rgba(255,255,255,.12);color:#fff;font-size:18px;font-weight:900;cursor:pointer;}
+  .gbtn.on{background:#2e9e5b;border-color:#2e9e5b;}
+  .codebox{background:#fff;color:#0f3a5f;border-radius:16px;padding:13px 26px;margin:16px 0 4px;font-size:16px;font-weight:800;text-align:center;}
+  .codebox b{font-size:32px;letter-spacing:5px;color:#0e7c7c;display:block;margin-top:4px;}
+  .codebox .cbsub{font-size:12px;font-weight:700;color:#7a8794;margin-top:6px;}
+  .codebox.warn{background:#fff4e8;color:#a35a12;}
+  .goodpop{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:60;pointer-events:none;font-family:'Arial Black','Arial',sans-serif;font-weight:900;font-style:italic;font-size:88px;letter-spacing:2px;color:#ffe14a;-webkit-text-stroke:5px #c4281c;text-shadow:0 6px 0 #7a0f0a,0 0 20px rgba(255,210,74,.85);white-space:nowrap;animation:goodpop 1.15s cubic-bezier(.2,1.5,.4,1) forwards;}
+  @keyframes goodpop{0%{transform:translate(-50%,-50%) scale(.2) rotate(-12deg);opacity:0;}18%{transform:translate(-50%,-50%) scale(1.3) rotate(7deg);opacity:1;}34%{transform:translate(-50%,-50%) scale(.98) rotate(-3deg);}50%{transform:translate(-50%,-50%) scale(1.06) rotate(1deg);}72%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1;}100%{transform:translate(-50%,-50%) scale(.12) rotate(0);opacity:0;}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="bar"><div class="l"><button class="homebtn" onclick="goHome()">&#8962; Home</button><span>🥤 Smoothie Bar</span></div>
+    <div class="r"><span class="pill" id="lvl">Level 1</span><span class="pill">&#9733; <span id="score">0</span></span><span class="pill time" id="time">5:00</span></div>
+  </div>
+  <div class="wrap" id="game"></div>
+  <div class="calc hide" id="calcbox"></div>
+  <div class="ov" id="overlay">
+    <div class="big">🥤</div>
+    <h1>Smoothie Bar</h1>
+    <p>A customer asks for cups &times; mL. Work out the <b>total mL</b>, look up the drink's <b>ratio on your Recipe sheet</b>,
+    then each player pours their colour in <b>mL</b> (each tap = 50 mL). Tap <b>&#129518;</b> for a calculator.<br>
+    Fill the bar to the total, in the right ratio, then <b>SERVE</b>. 5 minutes &mdash; the further you go, the more points!</p>
+    <button onclick="startGame()">Start serving</button>
+  </div>
+</div>
+<script>
+"use strict";
+function svg(i,s){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle">'+i+'</svg>';}
+function orange(s){return svg('<path d="M50 24 q14 -10 24 -3 q-5 13 -23 9 Z" fill="#2e9e5b"/><circle cx="50" cy="58" r="33" fill="#ff9f1c" stroke="#cc7000" stroke-width="4"/><circle cx="40" cy="48" r="8" fill="#ffd28a"/>',s);}
+function strawberry(s){return svg('<path d="M50 90 C26 80 20 54 30 42 C40 32 60 32 70 42 C80 54 74 80 50 90 Z" fill="#e63950" stroke="#a3132b" stroke-width="4"/><path d="M34 42 L50 26 L66 42 C58 47 42 47 34 42 Z" fill="#2e9e5b" stroke="#1f6e43" stroke-width="3"/>',s);}
+function tea(s){return svg('<path d="M26 40 h48 l-5 40 q-1 9 -11 9 h-16 q-10 0 -11 -9 Z" fill="#eafaf0" stroke="#2f7d57" stroke-width="4"/><path d="M30 44 h40 l-1.5 11 q-19 6 -37 0 Z" fill="#3a9e63"/>',s);}
+function milk(s){return svg('<path d="M34 46 h32 v44 h-32 Z" fill="#ffffff" stroke="#3b6fa0" stroke-width="4"/><path d="M34 46 L50 28 L66 46 Z" fill="#6aa9d8" stroke="#3b6fa0" stroke-width="4"/><rect x="41" y="60" width="18" height="16" rx="2" fill="#cfe6fb" stroke="#3b6fa0" stroke-width="2"/>',s);}
+var ICON=[orange,strawberry,tea,milk];
+var ING=[["Orange","#ff9f1c"],["Strawberry","#e63950"],["Green tea","#3a9e63"],["Milk","#6aa9d8"]];
+var DRINKS=[
+ {name:"Sunrise Fizz",color:"#ff8a3c",r:[3,1,1,1]},{name:"Berry Cloud",color:"#e63950",r:[1,3,1,1]},
+ {name:"Jade Cooler",color:"#2e9e5b",r:[1,1,3,1]},{name:"Cloud Milk",color:"#4a90d9",r:[1,1,1,3]},
+ {name:"Rainbow Mix",color:"#8a5cd0",r:[2,2,1,1]},{name:"Twin Berry",color:"#c0397a",r:[3,2,2,1]},
+ {name:"Garden Mix",color:"#5a8f2e",r:[3,3,1,1]},{name:"Citrus Storm",color:"#e07b1f",r:[4,2,1,1]}];
+var NAMES_G=["Mia","Yan","Joy","Ka","Sum","Hei"],NAMES_B=["Tim","Sam","Ben","Ho","Ming","Lok"],SHIRTS=["#e0556a","#4a90d9","#f0a93c","#2e9e5b","#8a5cd0"];
+function customer(s,g,sh){var skin="#ffd9b3";var hair=g==="girl"
+ ?'<path d="M26 44 q24 -34 48 0 q4 26 -4 34 q-6 -22 -20 -22 q-14 0 -20 22 q-8 -8 -4 -34 Z" fill="#5a3a25"/><circle cx="24" cy="60" r="8" fill="#5a3a25"/><circle cx="76" cy="60" r="8" fill="#5a3a25"/>'
+ :'<path d="M26 46 q24 -30 48 0 q0 -2 0 -2 q-6 -14 -24 -14 q-18 0 -24 14 Z" fill="#3a2a1a"/>';
+ return svg('<path d="M22 110 q28 -26 56 0 v8 h-56 Z" fill="'+sh+'"/><circle cx="50" cy="54" r="30" fill="'+skin+'" stroke="#e0b48a" stroke-width="2"/>'+hair+'<circle cx="40" cy="54" r="3.4" fill="#3a2a1a"/><circle cx="60" cy="54" r="3.4" fill="#3a2a1a"/><path d="M42 66 q8 7 16 0" fill="none" stroke="#b5563a" stroke-width="3" stroke-linecap="round"/>',s);}
+
+var STEP=50,MAXML=1200;
+/* ---- per-group completion code (same formula across all games / answer key / unlock) ---- */
+var GAME_ID=1;var NUM_GROUPS=5;var CODE_ABC="23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+function codeFor(g,game){var n=((g*131+game*457+89)*2099)%1048576;return CODE_ABC[(n>>15)&31]+CODE_ABC[(n>>10)&31]+CODE_ABC[(n>>5)&31]+CODE_ABC[n&31];}
+var S={level:1,score:0,t:300,amt:[0,0,0,0],req:[0,0,0,0],drink:null,cups:0,perCup:0,total:0,part:0,cust:null,locked:false,timer:null,hint:0,wrong:0};
+function $(id){return document.getElementById(id);}
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function pick(a){return a[rnd(0,a.length-1)];}
+function gcd(a,b){return b===0?a:gcd(b,a%b);}
+function simp(a){var g=a.reduce(function(x,y){return gcd(x,y);});return a.map(function(v){return v/g;});}
+function eqRatio(x,y){var a=simp(x),b=simp(y);for(var i=0;i<4;i++)if(a[i]!==b[i])return false;return true;}
+
+function ratioBarIco(){return '<svg width="84" height="38" viewBox="0 0 84 38"><rect x="4" y="11" width="14" height="16" fill="#ff9f1c"/><rect x="18" y="11" width="30" height="16" fill="#e63950"/><rect x="48" y="11" width="14" height="16" fill="#3a9e63"/><rect x="62" y="11" width="14" height="16" fill="#6aa9d8"/><rect x="4" y="11" width="72" height="16" fill="none" stroke="#fff" stroke-width="2"/></svg>';}
+function cupIco(){return '<svg width="46" height="56" viewBox="0 0 46 56"><rect x="28" y="2" width="4" height="16" fill="#fff"/><path d="M9 12 h28 l-3.5 38 a3 3 0 0 1 -3 3 h-15 a3 3 0 0 1 -3 -3 z" fill="#dff0ff" stroke="#fff" stroke-width="2"/><path d="M11.5 30 h23 l-2 18 a2 2 0 0 1 -2 2 h-15 a2 2 0 0 1 -2 -2 z" fill="#ff9f1c"/></svg>';}
+function serveIco(){return '<svg width="50" height="50" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="#2e9e5b"/><path d="M15 26 l7 7 l13 -15" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';}
+function showStart(){
+ $('overlay').classList.remove('hide');
+ $('overlay').innerHTML='<div class="big">🥤</div><div class="ttl">Smoothie Bar</div>'+
+  '<div class="intro">Be the <span class="cO">smoothie barista</span>! Read each customer&rsquo;s <span class="cB">order</span>, use the <span class="cP">recipe ratio</span> to work out how much of each <span class="cG">colour</span> to pour, fill the cup to the <span class="cY">total</span>, then <span class="cG">SERVE</span>. Make as many drinks as you can in <span class="cR">5 minutes</span>!</div>'+
+  '<div class="sct">&#127918; HOW TO PLAY</div>'+
+  '<div class="flow">'+
+    '<div class="stepc"><div class="ic">'+customer(50,'girl','#4a90d9')+'</div><div class="tx">1. Read the order<br><b class="cB">cups &times; mL</b></div></div>'+
+    '<div class="arr">&rarr;</div>'+
+    '<div class="stepc"><div class="ic">'+ratioBarIco()+'</div><div class="tx">2. Look up the<br><b class="cP">ratio</b> (Recipe)</div></div>'+
+    '<div class="arr">&rarr;</div>'+
+    '<div class="stepc"><div class="ic">'+cupIco()+'</div><div class="tx">3. Pour colours<br><b class="cO">tap +50 mL</b></div></div>'+
+    '<div class="arr">&rarr;</div>'+
+    '<div class="stepc"><div class="ic">'+serveIco()+'</div><div class="tx">4. Fill to total<br><b class="cG">SERVE</b></div></div>'+
+  '</div>'+
+  '<div class="sct">&#127919; WHAT THE BUTTONS DO</div>'+
+  '<div class="legend2">'+
+    '<span class="blg"><span class="kbtn" style="background:#2e9e5b">+50</span><span class="kbtn" style="background:#c2ccd6;color:#13395c">&minus;50</span> <span class="cG">add</span> / <span class="cR">remove</span> 50 mL of a colour</span>'+
+    '<span class="blg"><span class="kbtn" style="background:#e7edf4;color:#13395c">&#129518;</span> <span class="cB">Calculator</span> &mdash; open a calculator for sums</span>'+
+    '<span class="blg"><span class="kbtn" style="background:#fde7c0;color:#8a5a12">&#128161;</span> <span class="cY">Hint</span> &mdash; step-by-step help (k-method)</span>'+
+    '<span class="blg"><span class="kbtn" style="background:#2e9e5b">SERVE</span> <span class="cG">check the drink</span> &amp; score points</span>'+
+    '<span class="blg"><span class="kbtn" style="background:#fff;color:#13395c">&#8962;</span> <span class="cP">Home</span> &mdash; back to this screen</span>'+
+  '</div>'+
+  '<button onclick="startGame()">Start serving</button>';
+}
+function goHome(){if(S.timer)clearInterval(S.timer);$('calcbox').classList.add('hide');showStart();}
+function startGame(){S.level=1;S.score=0;S.t=300;$('overlay').classList.add('hide');$('calcbox').classList.add('hide');
+ if(S.timer)clearInterval(S.timer);S.timer=setInterval(tick,1000);newOrder();}
+function tick(){S.t--;upTime();if(S.t<=0){clearInterval(S.timer);endGame();}}
+function upTime(){var m=Math.floor(S.t/60),s=S.t%60;var e=$('time');e.textContent=m+":"+(s<10?"0":"")+s;e.classList.toggle('warn',S.t<=60);}
+function newOrder(){
+ S.locked=false;S.amt=[0,0,0,0];S.hint=0;S.wrong=0;
+ var lv=S.level;
+ var partChoices=lv<=2?[50,100]:lv<=5?[50,100,150]:[100,150];
+ var cupChoices=lv<=2?[1,2]:[1,2,3];
+ var pool=lv<=3?DRINKS.slice(0,5):DRINKS;
+ var ok=null,tries=0;
+ while(!ok&&tries<200){tries++;
+  var d=pick(pool),sum=d.r.reduce(function(a,b){return a+b;},0),part=pick(partChoices),total=sum*part;
+  if(total>MAXML)continue;var opts=[];[100,150,200,250,300].forEach(function(v){if(total%v===0){var c=total/v;if(cupChoices.indexOf(c)>=0)opts.push([c,v]);}});
+  if(!opts.length)continue;var cv=pick(opts);ok={d:d,part:part,total:total,cups:cv[0],perCup:cv[1]};}
+ if(!ok)ok={d:DRINKS[0],part:100,total:600,cups:2,perCup:300};
+ S.drink=ok.d;S.part=ok.part;S.total=ok.total;S.cups=ok.cups;S.perCup=ok.perCup;S.req=ok.d.r.map(function(v){return v*ok.part;});
+ var g=Math.random()<0.5?"girl":"boy";S.cust={svg:customer(56,g,pick(SHIRTS)),name:(g==="girl"?pick(NAMES_G):pick(NAMES_B))};
+ render();
+}
+function render(){
+ var sum=S.amt[0]+S.amt[1]+S.amt[2]+S.amt[3];
+ var segs="";for(var i=0;i<4;i++){if(S.amt[i]>0)segs+='<div class="seg" style="width:'+(S.amt[i]/S.total*100)+'%;background:'+ING[i][1]+'"></div>';}
+ var tiles="";
+ for(var j=0;j<4;j++){tiles+='<div class="tile">'+
+   '<div class="cap" style="background:'+ING[j][1]+'">'+ICON[j](26)+'<span>'+ING[j][0]+'</span></div>'+
+   '<div class="val">'+S.amt[j]+'<span class="u">mL</span></div>'+
+   '<div class="btns"><button class="minus" onclick="chg('+j+',-1)">&minus;50</button>'+
+   '<button style="background:'+ING[j][1]+'" onclick="chg('+j+',1)">+50</button></div></div>';}
+ $('game').innerHTML=
+  '<div class="order"><div class="av">'+S.cust.svg+'</div>'+
+    '<div class="txt">'+S.cust.name+' wants <span class="hl">'+S.cups+' cup'+(S.cups>1?'s':'')+' &times; '+S.perCup+' mL</span> of '+
+    '<span style="color:'+S.drink.color+'">'+S.drink.name+'</span>'+
+    '<span class="small">Look up the ratio on your Recipe sheet.</span></div></div>'+
+  hintHTML()+
+  '<div class="prog"><div class="ptrack">'+segs+'</div>'+
+    '<div class="plabel">'+sum+' / '+S.total+' mL</div></div>'+
+  '<div class="tiles">'+tiles+'</div>'+
+  '<div class="foot"><button class="calcbtn" onclick="toggleCalc()">&#129518; Calculator</button>'+
+    '<button class="hintbtn" onclick="toggleHint()">&#128161; Hint</button>'+
+    '<div class="fb" id="fb"></div>'+
+    '<button class="serve" onclick="serve()">SERVE</button></div>';
+ $('lvl').textContent='Level '+S.level;$('score').textContent=S.score;
+}
+function hintHTML(){
+ if(!S.hint)return '';
+ var rr=S.drink.r,sum=rr.reduce(function(a,b){return a+b;},0),per=S.part;
+ var blocks='',addends=[],ratioPlain=[],ratioKmL=[];
+ for(var i=0;i<4;i++){if(rr[i]<=0)continue;var grp='';for(var j=0;j<rr[i];j++)grp+='<span class="pblk" style="background:'+ING[i][1]+'"></span>';
+   blocks+=(blocks?'<span class="plus">+</span>':'')+'<span class="pgrp">'+grp+'</span>';addends.push(rr[i]);ratioPlain.push(rr[i]);ratioKmL.push(rr[i]+'k mL');}
+ var h='<div class="hintbox">'+
+  '<div class="hrow"><span class="hl">&#128161; k-method</span><span class="hnote"><b>'+ratioPlain.join(' : ')+'</b> is not exactly <b>'+sum+' mL</b> in total &mdash; it means <b>'+ratioKmL.join(' : ')+'</b>; each block = one <b>k mL</b>:</span>'+blocks+'</div>'+
+  '<div class="hrow"><span class="hl">Count</span><span class="hnote">parts = '+addends.join('+')+' = <b>'+sum+'</b>&nbsp;&rarr;&nbsp; total = <b>'+sum+'k mL</b></span></div>'+
+  '<div class="hrow"><span class="hl">Find k</span><span class="tag">total = '+S.cups+' &times; '+S.perCup+' = '+S.total+' mL</span><span class="harr">&rarr;</span><span class="tag">'+sum+'k = '+S.total+'</span><span class="harr">&rarr;</span><span class="tag">k = '+S.total+' &divide; '+sum+' = '+per+' mL</span></div>';
+ if(S.hint>=2){var chips='';for(var k=0;k<4;k++){if(rr[k]>0)chips+='<span class="pchip" style="background:'+ING[k][1]+'">'+ING[k][0]+' = '+rr[k]+'k = '+S.req[k]+' mL</span> ';}
+   h+='<div class="hrow"><span class="hl">&#9758; Pour = ratio &times; k</span>'+chips+'</div>';}
+ return h+'</div>';
+}
+function toggleHint(){if(S.locked)return;S.hint=S.hint>0?0:1;render();}
+function chg(i,d){if(S.locked)return;S.amt[i]=Math.max(0,Math.min(MAXML,S.amt[i]+d*STEP));render();}
+function flash(m,c){var e=$('fb');if(e){e.textContent=m;e.className='fb '+(c==='ok'?'ok':'no');}}
+function serve(){
+ if(S.locked)return;var sum=S.amt[0]+S.amt[1]+S.amt[2]+S.amt[3];
+ if(sum!==S.total){S.wrong++;if(S.wrong>=2)S.hint=2;render();flash('Fill to '+S.total+' mL (now '+sum+').','no');return;}
+ if(!eqRatio(S.amt,S.drink.r)){S.wrong++;if(S.wrong>=2)S.hint=2;var sm=simp(S.amt);render();flash('Ratio is '+sm.join(':')+' - check your Recipe sheet.','no');return;}
+ S.locked=true;var pts=10*S.level;S.score+=pts;flash('Perfect! +'+pts,'ok');goodPop('GOOD!!');S.level++;
+ setTimeout(function(){if(S.t>0)newOrder();},1200);
+}
+function goodPop(t){var d=document.createElement('div');d.className='goodpop';d.textContent=t||'GOOD!!';$('app').appendChild(d);setTimeout(function(){d.remove();},1200);}
+function bigFeed(e){var d=document.createElement('div');d.textContent=e;d.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;z-index:35;pointer-events:none;';$('app').appendChild(d);setTimeout(function(){d.remove();},1100);}
+function endGame(){$('calcbox').classList.add('hide');$('overlay').classList.remove('hide');
+ $('overlay').innerHTML='<div class="big">⏱️🏆</div><h1>Time&#39;s up!</h1><p>Final score:</p>'+
+ '<div style="font-size:58px;font-weight:900;color:#ffd24a">&#9733; '+S.score+'</div><p>You reached <b>Level '+S.level+'</b>.</p>'+
+ '<button onclick="startGame()">Play again</button>';}
+
+var C={disp:"0",acc:null,op:null,fresh:true};
+function toggleCalc(){var b=$('calcbox');if(b.classList.contains('hide')){b.classList.remove('hide');renderCalc();}else b.classList.add('hide');}
+function fmt(n){return (Math.round(n*10000)/10000).toString();}
+function calcDigit(d){if(C.fresh){C.disp=(d==="."?"0.":d);C.fresh=false;}else{if(d==="."&&C.disp.indexOf(".")>=0)return;C.disp=(C.disp==="0"&&d!==".")?d:C.disp+d;}renderCalc();}
+function calcOp(o){if(C.op!==null&&!C.fresh){C.acc=ap(C.acc,parseFloat(C.disp),C.op);C.disp=fmt(C.acc);}else C.acc=parseFloat(C.disp);C.op=o;C.fresh=true;renderCalc();}
+function calcEq(){if(C.op!==null){C.acc=ap(C.acc,parseFloat(C.disp),C.op);C.disp=fmt(C.acc);C.op=null;C.fresh=true;renderCalc();}}
+function calcClear(){C.disp="0";C.acc=null;C.op=null;C.fresh=true;renderCalc();}
+function calcBack(){if(C.fresh)return;C.disp=C.disp.length>1?C.disp.slice(0,-1):"0";renderCalc();}
+function ap(a,b,o){return o==="+"?a+b:o==="-"?a-b:o==="*"?a*b:(b===0?0:a/b);}
+function renderCalc(){
+ var keys=[['7','d'],['8','d'],['9','d'],['÷','/'],['4','d'],['5','d'],['6','d'],['×','*'],['1','d'],['2','d'],['3','d'],['−','-'],['0','d'],['.','d'],['⌫','b'],['+','+']];
+ var h='<button class="close" onclick="toggleCalc()">&times;</button><div class="disp">'+C.disp+'</div><div class="ks">'+
+  '<button class="k clr" style="grid-column:span 4" onclick="calcClear()">Clear</button>';
+ keys.forEach(function(k){var l=k[0],t=k[1];
+   if(t==='d')h+='<button class="k" onclick="calcDigit(\''+l+'\')">'+l+'</button>';
+   else if(t==='b')h+='<button class="k" onclick="calcBack()">'+l+'</button>';
+   else h+='<button class="k op" onclick="calcOp(\''+t+'\')">'+l+'</button>';});
+ h+='<button class="k eq" style="grid-column:span 4" onclick="calcEq()">=</button></div>';
+ $('calcbox').innerHTML=h;
+}
+/* ---- bubble press sound + tap animation on every button ---- */
+var actx=null;
+function ensureAudio(){try{if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();}catch(e){}}
+function bubbleSnd(){ensureAudio();if(!actx)return;try{var t=actx.currentTime;
+ var o=actx.createOscillator(),g=actx.createGain(),f=actx.createBiquadFilter();
+ o.type='sine';o.frequency.setValueAtTime(380,t);o.frequency.exponentialRampToValueAtTime(940,t+0.08);o.frequency.exponentialRampToValueAtTime(560,t+0.17);
+ f.type='lowpass';f.frequency.value=1800;
+ g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.30,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.19);
+ o.connect(f);f.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+0.2);}catch(e){}}
+document.addEventListener('pointerdown',function(e){
+ var b=e.target&&e.target.closest?e.target.closest('button'):null;if(!b)return;
+ bubbleSnd();
+ b.classList.remove('tapped');void b.offsetWidth;b.classList.add('tapped');
+ setTimeout(function(){b.classList.remove('tapped');},300);
+},true);
+showStart();
+</script>
+</body>
+</html>
