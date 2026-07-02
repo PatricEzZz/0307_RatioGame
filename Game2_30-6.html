@@ -46,9 +46,9 @@
   .fl .pchip{font-size:10px;font-weight:900;color:#fff;border-radius:8px;padding:2px 6px;flex:0 0 auto;}
   .fl .fg{font-size:21px;} .fl .lm{font-size:19px;}
   .fl .cn{font-size:13px;font-weight:900;line-height:1.05;min-width:0;overflow:hidden;}.fl .cn span{display:block;font-size:9px;color:#7a8794;}
-  .pr{font-size:15px;font-weight:900;color:#13395c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pr{font-size:19px;font-weight:900;color:#c4501c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .pr .u{font-size:9px;color:#7a8794;}
-  .rt{font-size:10px;font-weight:800;color:#54616d;background:#f1f6f6;border-radius:8px;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;}
+  .rt{font-size:13px;font-weight:900;color:#7a4a00;background:#fff3c0;border:2px solid #f0a93c;border-radius:9px;padding:5px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;box-shadow:0 2px 0 rgba(196,122,16,.25);}
   .conv{border:none;border-radius:11px;padding:8px 5px;font-size:13px;font-weight:900;cursor:pointer;text-align:center;width:100%;
     box-shadow:0 3px 0 rgba(0,0,0,.14);transition:transform .07s ease,box-shadow .07s ease,filter .07s ease;}
   .conv:active{transform:translateY(3px) scale(.98);box-shadow:0 0 0 rgba(0,0,0,.14);filter:brightness(.95);}
@@ -63,7 +63,8 @@
   .paybtn{color:#fff;font-weight:900;font-size:12px;border:none;border-radius:13px;padding:9px 0;width:100%;background:#2e9e5b;
     box-shadow:0 4px 0 #1f7a44;transition:transform .07s ease,box-shadow .07s ease,filter .07s ease;}
   .paybtn:active{transform:translateY(4px) scale(.97);box-shadow:0 0 0 #1f7a44;filter:brightness(.96);}
-  .fb{text-align:center;font-size:14px;font-weight:800;min-height:18px;margin-top:5px;flex:0 0 auto;}
+  .fb{text-align:center;font-size:15px;font-weight:900;min-height:18px;margin-top:5px;flex:0 0 auto;background:#fff7dd;border:2px dashed #f0cf7a;border-radius:10px;padding:5px 10px;color:#3a3324;}
+  .kw-o{color:#e07b1f;}.kw-g{color:#1f8a4c;}.kw-r{color:#d8443f;}.kw-b{color:#1f6fd6;}
   .fb.ok{color:#1f8a4c;}.fb.no{color:#c0392b;}
   /* jar + footer */
   .foot{display:flex;align-items:center;gap:12px;flex:0 0 auto;margin-top:6px;}
@@ -71,8 +72,8 @@
   .jar .t{font-size:11px;font-weight:800;color:#0e5a5a;display:flex;justify-content:space-between;}
   .jbarwrap{height:13px;background:#eef2f5;border-radius:7px;overflow:hidden;margin-top:3px;}
   .jbar{height:100%;width:0;background:linear-gradient(90deg,#ffd24a,#ff9f1c);transition:width .4s;}
-  .pad{display:grid;grid-template-columns:repeat(3,50px);grid-auto-rows:38px;gap:6px;}
-  .pad .k{width:100%;height:100%;border:none;border-radius:9px;background:#dbe7ea;color:#13395c;font-size:17px;font-weight:800;}
+  .pad{display:grid;grid-template-columns:repeat(3,58px);grid-auto-rows:46px;gap:7px;}
+  .pad .k{width:100%;height:100%;border:none;border-radius:11px;background:#e3ecf5;color:#13395c;font-size:20px;font-weight:900;box-shadow:0 3px 0 rgba(19,57,92,.18);}
   .pad .k:active{transform:scale(.92);}
   .calcbtn{background:#15557a;color:#fff;border:none;border-radius:11px;padding:11px 14px;font-size:13px;font-weight:800;}
   .hintbtn{background:#f0a93c;color:#fff;border:none;border-radius:11px;padding:11px 14px;font-size:13px;font-weight:800;}
@@ -87,7 +88,10 @@
   .optbtn{background:#eaf0f6;color:#13486e;border:2px solid #cdd9e6;border-radius:12px;padding:9px 15px;font-size:14px;font-weight:800;cursor:pointer;}
   .optbtn.on{background:#2e9e5b;border-color:#2e9e5b;color:#fff;}
   /* calculator (draggable) */
-  .calc{position:absolute;left:50%;top:90px;width:178px;background:#0f2435;border-radius:14px;padding:8px;z-index:30;box-shadow:0 12px 32px rgba(0,0,0,.5);touch-action:none;}
+  .calc{position:absolute;left:50%;top:90px;width:190px;background:#0f2435;border-radius:14px;padding:8px;z-index:30;box-shadow:0 12px 32px rgba(0,0,0,.5);touch-action:none;transform-origin:top left;}
+  .calc .crow{display:flex;align-items:center;gap:4px;}
+  .calc .szb{border:none;border-radius:8px;width:30px;height:26px;font-size:15px;font-weight:900;background:#2a4a66;color:#fff;cursor:pointer;flex:0 0 auto;}
+  .calc .szb:active{transform:scale(.9);}
   .calc .chandle{display:flex;align-items:center;justify-content:center;gap:6px;color:#bcd2e6;font-size:10px;font-weight:800;padding:1px 0 6px;cursor:move;touch-action:none;user-select:none;}
   .calc .chandle .grip{letter-spacing:2px;font-size:12px;}
   .calc .disp{background:#cfe6d6;color:#10331f;border-radius:8px;text-align:right;font-size:19px;font-weight:900;padding:6px 9px;margin-bottom:6px;}
@@ -156,10 +160,10 @@ var CITIES=["Tokyo","Seoul","Bangkok","Jakarta","Manila","Singapore"];
 var GAME_ID=2;var NUM_GROUPS=5;var CODE_ABC="23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 function codeFor(g,game){var n=((g*131+game*457+89)*2099)%1048576;return CODE_ABC[(n>>15)&31]+CODE_ABC[(n>>10)&31]+CODE_ABC[(n>>5)&31]+CODE_ABC[n&31];}
 var CITY_TARGET=200;
-var ASKS=["Each of you take one country &mdash; which is cheapest to pay?",
-          "Quick team, convert your own price! Which currency is cheapest?",
-          "Help Mum save money &mdash; everyone convert, then pick the cheapest!",
-          "Compare the shops — which currency is the best deal?"];
+var ASKS=["Each of you <span class='kw-b'>take one country</span> &mdash; which is <span class='kw-g'>cheapest</span> to pay?",
+          "Quick team, <span class='kw-o'>convert your own price</span>! Which currency is <span class='kw-g'>cheapest</span>?",
+          "Help Mum <span class='kw-r'>save money</span> &mdash; everyone <span class='kw-o'>convert</span>, then pick the <span class='kw-g'>cheapest</span>!",
+          "Compare the shops — which currency is the <span class='kw-g'>best deal</span>?"];
 
 function mum(s){return ('<svg width="'+s+'" height="'+s+'" viewBox="0 0 100 100">'
  +'<path d="M20 112 q30 -30 60 0 v6 h-60 Z" fill="#e0556a"/>'
@@ -312,7 +316,7 @@ function render(){
    '<div class="rtimer"><span class="lab">&#9201; This order:</span><div class="rbarwrap"><div class="rbar" id="rbar"></div></div><span class="rsec" id="rsec">0:00</span></div>'+
    (S.hint?rateHintHTML():'')+
    '<div class="rows">'+rowsH+'</div>'+
-   '<div class="fb" id="fb">Everyone: convert YOUR country to HK$, then pick the cheapest together.</div>'+
+   '<div class="fb" id="fb">Everyone: <span class="kw-o">convert YOUR country to HK$</span>, then pick the <span class="kw-g">cheapest</span> together.</div>'+
    '<div class="foot"><button class="calcbtn" onclick="toggleCalc()">&#129518; Calculator</button>'+
      '<button class="hintbtn" onclick="toggleHint()">&#128161; Hint</button>'+
      '<div class="jar"><div class="t"><span>&#127881; Trip Savings &rarr; '+nextCity+'</span><span>HK$ '+(S.saved-curBase)+' / '+CITY_TARGET+'</span></div>'+
@@ -367,14 +371,17 @@ function endGame(){$('calcbox').classList.add('hide');$('overlay').classList.rem
 /* calculator (draggable) */
 var C={disp:"0",acc:null,op:null,fresh:true};
 function toggleCalc(){var b=$('calcbox');if(b.classList.contains('hide')){b.classList.remove('hide');
-  if(!b.dataset.moved){var app=$('app');b.style.left=Math.max(8,(app.clientWidth-178)/2)+'px';b.style.top='96px';}
-  renderCalc();}else b.classList.add('hide');}
+  if(!b.dataset.moved){var app=$('app');b.style.left=Math.max(8,(app.clientWidth-190)/2)+'px';b.style.top='96px';}
+  applyCalcScale();renderCalc();}else b.classList.add('hide');}
+function applyCalcScale(){var b=$('calcbox');b.style.transform='scale('+(C.scale||1)+')';}
+function calcScale(d){C.scale=Math.round(Math.max(0.75,Math.min(1.7,(C.scale||1)+d))*100)/100;applyCalcScale();}
 var DG={on:false,dx:0,dy:0};
 function dragStart(e){var b=$('calcbox');var r=b.getBoundingClientRect();var p=e.touches?e.touches[0]:e;
   DG.on=true;DG.dx=p.clientX-r.left;DG.dy=p.clientY-r.top;b.dataset.moved="1";if(e.preventDefault)e.preventDefault();}
 function dragMove(e){if(!DG.on)return;var b=$('calcbox');var app=$('app').getBoundingClientRect();var p=e.touches?e.touches[0]:e;
+  var r=b.getBoundingClientRect();
   var x=p.clientX-app.left-DG.dx,y=p.clientY-app.top-DG.dy;
-  x=Math.max(0,Math.min(app.width-b.offsetWidth,x));y=Math.max(0,Math.min(app.height-b.offsetHeight,y));
+  x=Math.max(0,Math.min(app.width-r.width,x));y=Math.max(0,Math.min(app.height-r.height,y));
   b.style.left=x+'px';b.style.top=y+'px';if(e.preventDefault)e.preventDefault();}
 function dragEnd(){DG.on=false;}
 window.addEventListener('pointermove',dragMove,{passive:false});
@@ -391,7 +398,9 @@ function ap(a,b,o){return o==="+"?a+b:o==="-"?a-b:o==="*"?a*b:(b===0?0:a/b);}
 function renderCalc(){
  var keys=[['7','d'],['8','d'],['9','d'],['÷','/'],['4','d'],['5','d'],['6','d'],['×','*'],['1','d'],['2','d'],['3','d'],['−','-'],['0','d'],['.','d'],['⌫','b'],['+','+']];
  var h='<button class="close" onclick="toggleCalc()">&times;</button>'+
-  '<div class="chandle" onpointerdown="dragStart(event)" ontouchstart="dragStart(event)"><span class="grip">&#8942;&#8942;</span> drag me</div>'+
+  '<div class="crow"><button class="szb" onclick="calcScale(-0.15)" title="smaller">&#8722;</button>'+
+  '<div class="chandle" style="flex:1" onpointerdown="dragStart(event)" ontouchstart="dragStart(event)"><span class="grip">&#8942;&#8942;</span> drag me</div>'+
+  '<button class="szb" onclick="calcScale(0.15)" title="bigger">&#65291;</button></div>'+
   '<div class="disp">'+C.disp+'</div><div class="ks">'+
   '<button class="k clr" style="grid-column:span 4" onclick="cC()">Clear</button>';
  keys.forEach(function(k){var l=k[0],t=k[1];

@@ -26,15 +26,16 @@
   .task{display:flex;align-items:center;gap:12px;background:#d6f0f5;border:2px solid #b9e2ea;border-radius:13px;padding:6px 13px;}
   .task .bubble{flex:1;background:#fff;border:2.5px solid #0e4d63;border-radius:13px;padding:6px 13px;}
   .task .bubble .hi{font-size:12px;font-weight:800;color:#0e6a7a;}
-  .task .bubble .ms{font-size:15px;font-weight:900;color:#0e3a4a;line-height:1.2;}
-  .chart{flex:0 0 auto;background:#fff;border:2px solid #b9e2ea;border-radius:12px;padding:5px 12px;text-align:center;}
-  .chart .cl{font-size:10px;font-weight:800;color:#0e6a7a;}
-  .chart .cv{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:900;color:#0e3a4a;margin-top:2px;}
+  .task .bubble .ms{font-size:17px;font-weight:900;color:#0e3a4a;line-height:1.25;}
+  .kw-o{color:#e07b1f;}.kw-g{color:#1f8a4c;}.kw-r{color:#d8443f;}
+  .chart{flex:0 0 auto;background:#fff3c0;border:3px solid #f0a93c;border-radius:12px;padding:5px 14px;text-align:center;box-shadow:0 2px 0 rgba(196,122,16,.3);}
+  .chart .cl{font-size:11px;font-weight:900;color:#c47a10;}
+  .chart .cv{display:flex;align-items:center;gap:7px;font-size:22px;font-weight:900;color:#0e3a4a;margin-top:2px;}
   .chart .cv .grp{display:inline-flex;align-items:center;gap:2px;}
   .chart .cv .sep{color:#9fb6c9;}
-  .chart.alt .cv2{font-size:11px;font-weight:800;color:#0e6a7a;margin-top:3px;}
+  .chart.alt .cv2{font-size:12px;font-weight:900;color:#c4281c;margin-top:3px;}
   .bandtag{font-size:9px;font-weight:900;color:#fff;border-radius:8px;padding:1px 7px;margin-left:6px;vertical-align:middle;}
-  .reqbox{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;font-weight:800;color:#0e4d63;margin:0 0 4px;}
+  .reqbox{display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:900;color:#0e4d63;margin:0 0 4px;}
   .ratiobox{display:inline-flex;align-items:center;gap:5px;border:2.5px solid #0e4d63;background:#fff3c4;border-radius:9px;padding:2px 12px;font-size:17px;font-weight:900;white-space:nowrap;box-shadow:0 2px 0 rgba(14,77,99,.25);}
   .ratiobox .rc{color:#0e4d63;font-size:14px;}
   /* answer reveal modal */
@@ -58,21 +59,24 @@
   .rtimer .lab{font-size:12px;font-weight:800;color:#0e4d63;white-space:nowrap;}
   .rtimer .rbarwrap{flex:1;height:14px;background:#cfe2e6;border-radius:8px;overflow:hidden;}
   .rtimer .rbar{height:100%;width:100%;background:#2e9e5b;border-radius:8px;transition:width .9s linear,background .3s;}
-  .rtimer .rsec{font-size:14px;font-weight:900;color:#0e4d63;min-width:42px;text-align:right;}
+  .rtimer .rsec{font-size:19px;font-weight:900;color:#0e4d63;min-width:52px;text-align:right;}
+  .rtimer .rsec.danger{color:#e0463a;animation:secpulse .8s infinite;}
+  @keyframes secpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
   /* two tanks */
   .tanks{display:flex;gap:12px;flex:1;min-height:0;margin-top:2px;}
   .tankcol{flex:1;display:flex;flex-direction:column;min-height:0;}
-  .tankhdr{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:900;color:#0e4d63;padding:0 4px 3px;}
-  .tankhdr .ok{font-size:12px;font-weight:900;border-radius:10px;padding:2px 9px;}
-  .tankhdr .ok.yes{background:#d8f1df;color:#1f8a4c;} .tankhdr .ok.no{background:#fde9c9;color:#a35a12;}
-  .tank{position:relative;flex:1;min-height:130px;background:linear-gradient(180deg,#bdeaf5,#7fcfe6);border:3px solid #2f8fa8;border-top-width:5px;border-radius:10px;padding:8px 6px 16px;display:flex;gap:5px;align-items:flex-start;overflow:hidden;}
+  .tankhdr{display:flex;align-items:center;justify-content:space-between;font-size:16px;font-weight:900;color:#0e3a4a;padding:0 4px 3px;}
+  .tankhdr .ok{font-size:14px;font-weight:900;border-radius:10px;padding:3px 12px;}
+  .tankhdr .ok.yes{background:#1f8a4c;color:#fff;box-shadow:0 0 8px rgba(31,138,76,.6);} .tankhdr .ok.no{background:#f0a93c;color:#fff;}
+  .tank{position:relative;flex:1;min-height:130px;background:linear-gradient(180deg,#bdeaf5,#7fcfe6);border:3px solid #2f8fa8;border-top-width:5px;border-radius:10px;padding:10px 8px 20px;display:flex;gap:6px;align-items:flex-start;overflow:hidden;}
+  .emptyhint{align-self:center;font-size:14px;font-weight:800;color:#5aa7bc;opacity:.75;border:2px dashed #7fc3d6;border-radius:12px;padding:8px 16px;}
   .tank.hot{border-color:#2e9e5b;box-shadow:0 0 0 3px #bfe6cd inset;}
   .tank .sand{position:absolute;left:0;right:0;bottom:0;height:13px;background:#ecd9a6;border-top:2px solid #d8c184;}
-  .spcol{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;z-index:1;}
-  .fishw{flex:0 0 auto;z-index:1;cursor:grab;touch-action:none;display:inline-flex;}
+  .spcol{flex:1;min-width:0;display:flex;flex-flow:row wrap;justify-content:flex-start;align-content:flex-start;gap:4px 6px;z-index:1;}
+  .fishw{flex:0 0 auto;z-index:1;cursor:grab;touch-action:none;display:inline-flex;padding:6px;margin:-4px;}
   .fishw:active{cursor:grabbing;}
   .dragclone{position:fixed;z-index:60;pointer-events:none;transform:translate(-50%,-50%) scale(1.15);filter:drop-shadow(0 6px 8px rgba(0,0,0,.35));}
-  .fb{text-align:center;font-size:14px;font-weight:800;min-height:18px;margin-top:6px;flex:0 0 auto;}
+  .fb{text-align:center;font-size:15px;font-weight:900;min-height:18px;margin-top:6px;flex:0 0 auto;background:#fff7dd;border:2px dashed #f0cf7a;border-radius:10px;padding:5px 10px;color:#3a3324;}
   .fb.ok{color:#1f8a4c;}.fb.no{color:#c0392b;}
   .foot{display:flex;align-items:center;gap:12px;flex:0 0 auto;margin-top:6px;}
   .hintbtn{background:#f0a93c;color:#fff;border:none;border-radius:11px;padding:10px 14px;font-size:13px;font-weight:800;flex:0 0 auto;}
@@ -118,7 +122,7 @@
 <div id="app">
   <div class="statusbar">
     <div class="ttl"><button class="homebtn" onclick="goHome()">&#8962; Home</button>&#128032; Reef Rescue &middot; Balance the Tanks</div>
-    <div><span class="pill">Level <b id="lvlnum">1</b> / 20</span><span class="pill"><span id="starIcon" class="staricon">&#9733;</span> <b id="scoreNum">0</b></span></div>
+    <div><span class="pill">Level <b id="lvlnum">1</b> / 10</span><span class="pill"><span id="starIcon" class="staricon">&#9733;</span> <b id="scoreNum">0</b></span></div>
   </div>
   <div class="wrap" id="game"></div>
   <div class="ov" id="overlay"></div>
@@ -157,17 +161,20 @@ function spTetra(s){return svgw(
  '<rect x="20" y="25" width="32" height="4" rx="2" fill="rgba(255,255,255,.4)"/>'+
  '<circle cx="28" cy="27" r="4" fill="#fff"/><circle cx="27" cy="27" r="2.1" fill="#15303a"/>',s);}
 // ordered biggest -> smallest; biggest (Shark) always gets the SMALLEST count
-var POOL=[{n:"Shark",c:"#7e8b99",sz:58,draw:spShark},
-          {n:"Angelfish",c:"#e0556a",sz:46,draw:spAngel},
-          {n:"Goldfish",c:"#ffb01f",sz:40,draw:spGold},
-          {n:"Tetra",c:"#2e9e5b",sz:32,draw:spTetra}];
+var POOL=[{n:"Shark",c:"#7e8b99",sz:66,draw:spShark},
+          {n:"Angelfish",c:"#e0556a",sz:54,draw:spAngel},
+          {n:"Goldfish",c:"#ffb01f",sz:48,draw:spGold},
+          {n:"Tetra",c:"#2e9e5b",sz:42,draw:spTetra}];
 var ZONES=["Coral Cove","Kelp Forest","Blue Lagoon","Deep Reef","Turtle Bay","Pearl Reef"];
-var ZONE_TARGET=4;
-var MAXLEVEL=20;
-var ASKS=["Both tanks are messy! Drag fish so EACH tank has the healthy ratio.",
-          "Balance both tanks &mdash; big fish need more room, so keep fewer of them!",
-          "Share the fish: drag them so each tank matches the healthy ratio.",
-          "Sort the fish &mdash; each tank should show the same healthy ratio."];
+var ZONE_TARGET=2;
+var MAXLEVEL=10;
+/* 10-level curve: L1-5 normal; L6-8 = old L10-15 difficulty; L9-10 = old L16-20 difficulty. */
+var LVMAP=[0,1,2,3,4,5,10,13,15,17,20];
+function effLevel(){return LVMAP[Math.min(S.level,10)];}
+var ASKS=["Both tanks are messy! <span class='kw-o'>Drag fish</span> so <span class='kw-r'>EACH tank</span> has the <span class='kw-g'>healthy ratio</span>.",
+          "Balance both tanks &mdash; <span class='kw-r'>big fish need more room</span>, so keep <span class='kw-o'>fewer</span> of them!",
+          "Share the fish: <span class='kw-o'>drag them</span> so <span class='kw-r'>each tank</span> matches the <span class='kw-g'>healthy ratio</span>.",
+          "Sort the fish &mdash; <span class='kw-r'>each tank</span> should show the <span class='kw-g'>same healthy ratio</span>."];
 
 function fish(s,color){return ('<svg width="'+s+'" height="'+(s*0.62)+'" viewBox="0 0 100 62">'
  +'<ellipse cx="42" cy="31" rx="30" ry="18" fill="'+color+'"/>'
@@ -218,20 +225,21 @@ function startGame(){ensureAudio();clearAnswer();S.level=1;S.score=0;S.reef=0;S.
  $('overlay').classList.add('hide');
  if(S.timer)clearInterval(S.timer);S.timer=setInterval(tick,1000);newOrder();}
 function tick(){if(!S.locked){S.rt--;upRound();if(S.rt<=0)roundTimeout();}}
-function band(){return S.level<=5?'EASY':S.level<=14?'MEDIUM':S.level<=17?'HARD':'EXTREME';}
+function band(){var e=effLevel();return e<=5?'EASY':e<=14?'MEDIUM':e<=17?'HARD':'EXTREME';}
 function upRound(){var b=$('rbar'),sec=$('rsec');if(!b)return;var p=Math.max(0,S.rt/S.rtMax*100);b.style.width=p+'%';
  b.style.background=S.rt<=8?'#e0556a':S.rt<=18?'#f0a93c':'#2e9e5b';
- if(sec){var rr=Math.max(0,S.rt),m=Math.floor(rr/60),s=rr%60;sec.textContent=m+":"+(s<10?"0":"")+s;}}
+ if(sec){var rr=Math.max(0,S.rt),m=Math.floor(rr/60),s=rr%60;sec.textContent=m+":"+(s<10?"0":"")+s;sec.classList.toggle('danger',S.rt<=10);}}
 
 function tier(){
- if(S.level<=5)return {tanks:2,species:2};       // EASY: learn ratio; scaling introduced at L5
- if(S.level<=6)return {tanks:2,species:3};        // 3 kinds
- if(S.level<=14)return {tanks:3,species:3};       // 3 tanks, 3 kinds, shared ratio (gentler for F.1)
- return {tanks:3,species:2,perTank:true};         // L15+: each tank its OWN ratio (extreme at L18+)
+ var e=effLevel();
+ if(e<=5)return {tanks:2,species:2};             // L1-5 EASY: learn ratio; scaling introduced at L5
+ if(e<=14)return {tanks:3,species:3};             // L6-7: 3 tanks, 3 kinds, shared ratio
+ return {tanks:3,species:2,perTank:true};         // L8-10: each tank its OWN ratio (extreme at L10)
 }
 // scaling: counts = ratio x m. m=1 before L5 (learn the ratio), then >1 (test "scale up").
 function chooseM(sumR,tanks){
- var m=(S.level<5)?1:(2+Math.floor((S.level-5)/4));
+ var e=effLevel();
+ var m=(e<5)?1:(2+Math.floor((e-5)/4));
  while(m>1 && sumR*m*tanks>28) m--;
  return m;
 }
@@ -239,8 +247,9 @@ function countIn(tank,si){var c=0;for(var i=0;i<S.fish.length;i++){if(S.fish[i].
 function simp(a){var g=gcdArr(a);return g===0?a:a.map(function(v){return v/g;});}
 function ratioMatch(counts,ratio){var s=0;for(var i=0;i<counts.length;i++)s+=counts[i];if(s===0)return false;var a=simp(counts),b=simp(ratio);for(var i=0;i<a.length;i++)if(a[i]!==b[i])return false;return true;}
 function roundBudget(total){
- if(S.level<=5)return Math.max(20,Math.min(32,Math.round(14+total*1.6))); // EASY: short
- if(S.level<=14)return Math.max(45,Math.min(60,Math.round(34+total*2)));  // MEDIUM: 45-60s
+ var e=effLevel();
+ if(e<=5)return Math.max(20,Math.min(32,Math.round(14+total*1.6))); // EASY: short
+ if(e<=14)return Math.max(45,Math.min(60,Math.round(34+total*2)));  // MEDIUM: 45-60s
  return Math.max(60,Math.min(85,Math.round(48+total*2.4)));               // HARD/EXTREME: more time (60-85s)
 }
 
@@ -256,7 +265,7 @@ function newOrder(){
    var m=chooseM(sumR,nT);S.ratio=r;S.scale=m;
    for(var t=0;t<nT;t++){S.target.push(r.map(function(v){return v*m;}));S.tankRatio.push(r.slice());}
  } else {
-   var hi=(S.level>=18)?4:3, mtMax=(S.level>=18)?3:2, used={};
+   var hi=(effLevel()>=18)?4:3, mtMax=(effLevel()>=18)?3:2, used={};
    for(var t=0;t<nT;t++){
      var a,b,key,tr=0;
      do{a=rnd(1,hi);b=rnd(1,hi);var gg=gcd(a,b);a=a/gg;b=b/gg;key=Math.min(a,b)+':'+Math.max(a,b);tr++;}while(used[key]&&tr<25);
@@ -273,7 +282,7 @@ function newOrder(){
  do{ S.fish.forEach(function(f){f.tank=rnd(0,nT-1);}); tries++; }
  while((isBalanced()||misplaced()<4)&&tries<90);
  S.locked=false;S.hint=0;
- S.ask=S.perTank?"Each tank wants its OWN ratio — drag fish so every tank matches its label!":ASKS[rnd(0,ASKS.length-1)];
+ S.ask=S.perTank?"<span class='kw-r'>Each tank wants its OWN ratio</span> — <span class='kw-o'>drag fish</span> so every tank matches <span class='kw-g'>its label</span>!":ASKS[rnd(0,ASKS.length-1)];
  S.rtMax=roundBudget(S.fish.length);S.rt=S.rtMax;
  render();upRound();
 }
@@ -312,7 +321,7 @@ function render(){
    '</div>'+
    '<div class="rtimer"><span class="lab">&#9201; This round:</span><div class="rbarwrap"><div class="rbar" id="rbar"></div></div><span class="rsec" id="rsec">0:00</span></div>'+
    '<div class="tanks">'+tanksHTML+'</div>'+
-   '<div class="fb" id="fb">Drag fish so EVERY tank matches its ratio. A tank can hold a bigger amount &mdash; same ratio!</div>'+
+   '<div class="fb" id="fb"><span class="kw-o">Drag fish</span> so <span class="kw-r">EVERY tank</span> matches its <span class="kw-g">ratio</span>. A tank can hold a bigger amount &mdash; <span class="kw-g">same ratio</span>!</div>'+
    '<div class="foot"><button class="hintbtn" onclick="toggleHint()">&#128161; Hint</button><div class="legend">'+legend+'</div>'+
      '<div class="reef"><div class="t"><span>&#127756; Restore the reef &rarr; '+zoneName+'</span><span>'+(S.reef-S.zone*ZONE_TARGET)+' / '+ZONE_TARGET+' tanks</span></div>'+
        '<div class="reefbarwrap"><div class="reefbar" style="width:'+rp+'%"></div></div></div></div>';
@@ -320,13 +329,14 @@ function render(){
  $('scoreNum').textContent=S.score;
 }
 function tankHTML(t){
- var inner='';
+ var inner='',n=0;
  for(var sp=0;sp<S.sp.length;sp++){
    var col='';
-   for(var k=0;k<S.fish.length;k++){var f=S.fish[k];if(f.tank!==t||f.sp!==sp)continue;
+   for(var k=0;k<S.fish.length;k++){var f=S.fish[k];if(f.tank!==t||f.sp!==sp)continue;n++;
      col+='<span class="fishw" data-id="'+f.id+'" onpointerdown="fishDown(event,'+f.id+')" ontouchstart="fishDown(event,'+f.id+')">'+S.sp[sp].draw(S.sp[sp].sz)+'</span>';}
    inner+='<div class="spcol">'+col+'</div>';
  }
+ if(n===0)inner='<span class="emptyhint">&#128070; drag fish here</span>';
  var ok=tankOK(t);var letter=String.fromCharCode(65+t);
  var reqRow='';
  if(S.perTank){var tr=S.tankRatio[t];

@@ -54,8 +54,24 @@
   .weakline b{color:#c4281c;}
   .weakline .res{font-size:10px;color:#7a5a2a;font-weight:800;}
   .mon{transition:transform .12s;}
-  .mon.hit{animation:shake .4s;}
+  .mon.hit{animation:mchurt .55s;}
+  /* Minecraft-style hurt: the sprite flashes red while it recoils */
+  @keyframes mchurt{
+    0%{transform:translateX(0);filter:none}
+    8%{transform:translateX(-9px);filter:sepia(1) saturate(9) hue-rotate(-58deg) brightness(1.35)}
+    28%{transform:translateX(9px);filter:sepia(1) saturate(9) hue-rotate(-58deg) brightness(1.2)}
+    48%{transform:translateX(-6px);filter:none}
+    68%{transform:translateX(5px);filter:sepia(1) saturate(7) hue-rotate(-58deg) brightness(1.25)}
+    100%{transform:translateX(0);filter:none}}
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+  /* impact explosion at the hit point */
+  .blastring{position:absolute;z-index:32;pointer-events:none;width:14px;height:14px;border-radius:50%;
+    transform:translate(-50%,-50%);background:radial-gradient(circle,#fff9d8 0%,#ffce4a 45%,#ff7a2a 75%,rgba(255,90,20,0) 100%);
+    box-shadow:0 0 18px 6px rgba(255,150,40,.8);animation:blastring .5s ease-out forwards;}
+  @keyframes blastring{0%{width:14px;height:14px;opacity:1}70%{opacity:.9}100%{width:120px;height:120px;opacity:0}}
+  .blastboom{position:absolute;z-index:33;pointer-events:none;font-size:30px;transform:translate(-50%,-50%) scale(.4);
+    animation:blastboom .55s ease-out forwards;}
+  @keyframes blastboom{0%{transform:translate(-50%,-50%) scale(.4);opacity:0}25%{transform:translate(-50%,-50%) scale(1.5);opacity:1}70%{transform:translate(-50%,-50%) scale(1.2);opacity:1}100%{transform:translate(-50%,-50%) scale(1.7);opacity:0}}
   .speech{position:absolute;top:-6px;left:50%;transform:translateX(-50%) translateY(-100%);background:#fff;border:2.5px solid #2a2a4a;border-radius:12px;padding:5px 12px;font-size:12px;font-weight:900;color:#2a2a4a;white-space:nowrap;z-index:6;box-shadow:0 3px 8px rgba(0,0,0,.2);}
   .speech:after{content:"";position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);border-width:9px 7px 0 7px;border-style:solid;border-color:#2a2a4a transparent transparent transparent;}
   .dmg{position:absolute;font-size:30px;font-weight:900;color:#ffec3d;text-shadow:0 2px 0 #c4281c,0 0 4px #000;z-index:7;pointer-events:none;animation:dfloat 1s ease forwards;}
@@ -173,6 +189,11 @@
   .atk{background:#c4281c;color:#fff;border:none;border-radius:10px;padding:9px 22px;font-weight:900;font-size:15px;box-shadow:0 4px 0 #7a0f0a;cursor:pointer;}
   .atk:active{transform:translateY(4px);box-shadow:0 0 0 #7a0f0a;}
   .hint{font-size:10.5px;font-weight:800;color:#bfb0e6;text-align:center;}
+  /* bright per-skill "do this" banner */
+  .taskb{display:flex;align-items:center;justify-content:center;gap:7px;color:#fff;font-weight:900;font-size:13.5px;border-radius:10px;padding:7px 10px;text-align:center;line-height:1.3;box-shadow:0 0 0 2px rgba(255,255,255,.3) inset,0 2px 0 rgba(0,0,0,.35);animation:taskglow 1.5s ease-in-out infinite;}
+  @keyframes taskglow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.18)}}
+  .taskb .tbi{font-size:18px;line-height:1;}
+  .taskb b{color:#ffec3d;}
   .qf{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.02;margin:0 2px;}
   .qf .qn{border-bottom:2px solid currentColor;padding:0 4px;font-size:.78em;}
   .qf .qd{padding:0 4px;font-size:.78em;}
@@ -226,7 +247,7 @@
 <div id="app">
   <div class="statusbar">
     <div class="ttl"><button class="homebtn" onclick="goHome()">&#8962; Home</button>&#127812; Ratio Quest</div>
-    <div style="display:flex;align-items:center"><span class="invbar" id="invbar"></span><span class="pill">World <b id="foenum">1</b> / 10</span><span class="pill">&#129689; <b id="coins">0</b></span><button class="homebtn" id="helpbtn" onclick="reviewLesson()" style="margin-left:8px" title="Review ratio basics">&#128214; Help</button><button class="homebtn" id="musbtn" onclick="toggleMusic()" style="margin-right:0;margin-left:4px" title="Music on/off">&#128266; Music</button><button class="calcbtn" onclick="calcOpen()" title="Calculator (with powers)">&#129518; Calc</button></div>
+    <div style="display:flex;align-items:center"><span class="invbar" id="invbar"></span><span class="pill">World <b id="foenum">1</b> / 6</span><span class="pill">&#129689; <b id="coins">0</b></span><button class="homebtn" id="helpbtn" onclick="reviewLesson()" style="margin-left:8px" title="Review ratio basics">&#128214; Help</button><button class="homebtn" id="musbtn" onclick="toggleMusic()" style="margin-right:0;margin-left:4px" title="Music on/off">&#128266; Music</button><button class="calcbtn" onclick="calcOpen()" title="Calculator (with powers)">&#129518; Calc</button></div>
   </div>
   <div class="wrap" id="game"></div>
   <div class="ov" id="overlay"></div>
@@ -480,21 +501,17 @@ function princess(s){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 100 
  +'</svg>';}
 function monSVG(fn,c,d,s){s=s||112;return '<svg class="mon" width="'+s+'" height="'+s+'" viewBox="0 0 100 100"><ellipse cx="50" cy="92" rx="26" ry="6" fill="rgba(0,0,0,.18)"/>'+fn(c,d)+'</svg>';}
 
-/* ---------- enemies (10 worlds) ---------- */
+/* ---------- enemies (6 worlds) ---------- */
 /* weak = the skill it is super-effective (x1.6) against; resist = a skill that is only half-effective.
-   Weaknesses are ordered easy->deep: W1-2 Simplify, W3 Equal Kick, W4 Grow Blast, W5 Triple Stomp,
-   W6+ Fire Combo. Late foes RESIST basic Simplify so students must level up to the deeper skills. */
+   W1 Simplify, W2 Equal Kick, W3 FIRST BOSS (Triple Stomp), W4 Grow Blast, W5 Fire Combo,
+   W6 FINAL BOSS King Koopa (Fire Combo). Bosses RESIST basic Simplify. */
 var ENEMIES=[
  {n:"GUMBA",t:"MINI",tc:"#8a5a2a",c:"#a86a30",d:"#6b4a1a",hp:90,atk:7,draw:sGoomba,ele:"EARTH",weak:"simp2",lines:{in:"Grr! You shall not pass!",ko:"Bwa... mamma mia!"}},
- {n:"KOOPO",t:"SHELL",tc:"#2e9e4a",c:"#3ab85a",d:"#1f6e2e",hp:130,atk:9,draw:sKoopa,ele:"GRASS",weak:"simp2",lines:{in:"Into my shell you go!",ko:"Sho... shell shocked!"}},
- {n:"SPYKO",t:"SPIKE",tc:"#c4281c",c:"#e0463a",d:"#7a0f0a",hp:185,atk:11,draw:sSpiny,ele:"FIRE",weak:"equiv",lines:{in:"Equal me out if you can!",ko:"Pop! Deflated!"}},
- {n:"PIRANHO",t:"PLANT",tc:"#2e9e4a",c:"#e0463a",d:"#7a0f0a",hp:250,atk:12,draw:sPlant,ele:"GRASS",weak:"scale",lines:{in:"I grow bigger and bigger!",ko:"Wilt... back in the pipe."}},
- {n:"KOOPLING",t:"MAGI-BOSS",tc:"#a3132b",c:"#3ab85a",d:"#1f6e2e",hp:460,atk:14,draw:sKoopling,boss:true,ele:"BOSS",weak:"simp3",resist:"simp2",lines:{in:"Heh! Three-part ratios stump you!",ko:"No fair! I'll tell Dad!"}},
- {n:"BOO-OO",t:"GHOST",tc:"#6a4fb0",c:"#f5f5ff",d:"#c2c2dc",hp:330,atk:14,draw:sGhost,ele:"DARK",weak:"fusion",lines:{in:"Boo! Only a Fire Combo really hurts me!",ko:"Eeek... fading away!"}},
- {n:"HAMMO",t:"HAMMER",tc:"#8a6a3a",c:"#3ab85a",d:"#1f6e2e",hp:400,atk:16,draw:sHammer,ele:"EARTH",weak:"simp3",lines:{in:"Hammer time! Take this!",ko:"Clang... out of hammers!"}},
- {n:"LAKI",t:"CLOUD",tc:"#caa12a",c:"#ffd34d",d:"#caa12a",hp:470,atk:16,draw:sCloud,ele:"SPARK",weak:"fusion",lines:{in:"From up here, only a Fire Combo reaches me!",ko:"Whooa... falling!"}},
- {n:"THWOMPA",t:"STONE",tc:"#7a8b99",c:"#9aa6b4",d:"#4a5560",hp:540,atk:17,draw:sStone,ele:"EARTH",weak:"fusion",lines:{in:"I will CRUSH you flat!",ko:"Crack... crumbling!"}},
- {n:"KING KOOPA",t:"FINAL BOSS",tc:"#a3132b",c:"#2e7d3a",d:"#1a4a22",hp:720,atk:18,draw:sBowser,boss:true,ele:"BOSS",weak:"fusion",resist:"simp2",lines:{in:"Bwa ha ha! The Princess is MINE!",ko:"NOOO! My castle! My plan!"}}
+ {n:"SPYKO",t:"SPIKE",tc:"#c4281c",c:"#e0463a",d:"#7a0f0a",hp:160,atk:10,draw:sSpiny,ele:"FIRE",weak:"equiv",lines:{in:"Equal me out if you can!",ko:"Pop! Deflated!"}},
+ {n:"KOOPLING",t:"MAGI-BOSS",tc:"#a3132b",c:"#3ab85a",d:"#1f6e2e",hp:320,atk:13,draw:sKoopling,boss:true,ele:"BOSS",weak:"simp3",resist:"simp2",lines:{in:"Heh! Three-part ratios stump you!",ko:"No fair! I'll tell Dad!"}},
+ {n:"PIRANHO",t:"PLANT",tc:"#2e9e4a",c:"#e0463a",d:"#7a0f0a",hp:300,atk:14,draw:sPlant,ele:"GRASS",weak:"scale",lines:{in:"I grow bigger and bigger!",ko:"Wilt... back in the pipe."}},
+ {n:"BOO-OO",t:"GHOST",tc:"#6a4fb0",c:"#f5f5ff",d:"#c2c2dc",hp:380,atk:15,draw:sGhost,ele:"DARK",weak:"fusion",lines:{in:"Boo! Only a Fire Combo really hurts me!",ko:"Eeek... fading away!"}},
+ {n:"KING KOOPA",t:"FINAL BOSS",tc:"#a3132b",c:"#2e7d3a",d:"#1a4a22",hp:560,atk:17,draw:sBowser,boss:true,ele:"BOSS",weak:"fusion",resist:"simp2",lines:{in:"Bwa ha ha! The Princess is MINE!",ko:"NOOO! My castle! My plan!"}}
 ];
 function typeInfo(move){if(!S.foe)return {mult:1,tag:''};if(S.foe.weak===move)return {mult:1.6,tag:'super'};if(S.foe.resist===move)return {mult:0.55,tag:'resist'};return {mult:1,tag:''};}
 
@@ -746,6 +763,17 @@ function flyOne(el,sx,sy,ex,ey,arc,dur,delay){el.style.left=sx+'px';el.style.top
  } else { setTimeout(function(){el.style.transition='transform '+dur+'ms cubic-bezier(.4,.1,.5,1)';el.style.transform='translate('+(ex-sx)+'px,'+(ey-sy)+'px) scale(.7)';},delay+10); }
  setTimeout(function(){el.remove();},delay+dur+120);}
 function burst(x,y,col){for(var i=0;i<9;i++){(function(a){var p=mkfx('spark',col,null);p.style.left=x+'px';p.style.top=y+'px';var dx=Math.cos(a)*32,dy=Math.sin(a)*32;setTimeout(function(){p.style.transform='translate('+dx+'px,'+dy+'px) scale(.2)';p.style.opacity='0';},10);setTimeout(function(){p.remove();},440);})(i/9*6.283);}}
+function thudSnd(){tone([130,85,55],'sawtooth',0.05,0.16,0.2);}
+/* hurt flag survives the re-render so the red Minecraft-style flash always plays */
+function hurt(who){
+ if(who==='foe'){S.fxHurtFoe=true;setTimeout(function(){S.fxHurtFoe=false;},620);}
+ else{S.fxHurtMe=true;setTimeout(function(){S.fxHurtMe=false;},620);}
+ var c=ctr(who==='foe'?'.foe':'.me');if(c&&c.el)c.el.classList.add('hit');}
+function impactFx(sel){var t=ctr(sel);if(!t)return;var app=$('app');
+ burst(t.x,t.y,'#ffce4a');burst(t.x,t.y-8,'#ff7a2a');
+ var ring=document.createElement('div');ring.className='blastring';ring.style.left=t.x+'px';ring.style.top=t.y+'px';app.appendChild(ring);setTimeout(function(){ring.remove();},520);
+ var bm=document.createElement('div');bm.className='blastboom';bm.style.left=t.x+'px';bm.style.top=(t.y-6)+'px';bm.textContent='💥';app.appendChild(bm);setTimeout(function(){bm.remove();},580);
+ thudSnd();}
 function coinPop(x,y){for(var i=0;i<5;i++){(function(j){var c=mkfx('coin',null,'&#36;');c.style.left=x+'px';c.style.top=y+'px';var dx=(j-2)*16;setTimeout(function(){c.style.transition='transform .6s cubic-bezier(.3,-0.4,.6,1),opacity .6s';c.style.transform='translate('+dx+'px,-54px)';c.style.opacity='0';},10);setTimeout(function(){c.remove();},640);})(i);}coinSnd();}
 function beam(sx,sy,ex,ey,col){var len=Math.hypot(ex-sx,ey-sy),ang=Math.atan2(ey-sy,ex-sx)*180/Math.PI;var b=mkfx('beam',col,null);b.style.color=col;b.style.left=sx+'px';b.style.top=(sy-6)+'px';b.style.width='0px';b.style.transformOrigin='0 50%';b.style.transform='rotate('+ang+'deg)';setTimeout(function(){b.style.width=len+'px';},10);setTimeout(function(){b.style.opacity='0';},360);setTimeout(function(){b.remove();},540);}
 function dropOn(x,y,col,txt){var d=mkfx('rock',col,txt);d.style.left=(x-15)+'px';d.style.top=(y-170)+'px';setTimeout(function(){d.style.transition='transform .34s cubic-bezier(.6,0,.9,1)';d.style.transform='translateY(150px)';},10);setTimeout(function(){d.remove();},520);}
@@ -755,7 +783,7 @@ function okFx(big){var c=ctr('.me');if(c){burst(c.x,c.y-6,'#1f9a4c');if(big)burs
  var v=mkfx('bigok',null,'&#10003;');setTimeout(function(){v.style.transform='translate(-50%,-50%) scale(1)';v.style.opacity='1';},10);setTimeout(function(){v.style.opacity='0';},520);setTimeout(function(){v.remove();},720);}
 function errFx(){var fl=mkfx('flash',null,null);fl.style.background='rgba(224,34,74,.42)';setTimeout(function(){fl.style.opacity='0';},20);setTimeout(function(){fl.remove();},420);
  var x=mkfx('bigx',null,'&#10006;');setTimeout(function(){x.style.transform='translate(-50%,-50%) scale(1) rotate(-8deg)';x.style.opacity='1';},10);setTimeout(function(){x.style.opacity='0';},650);setTimeout(function(){x.remove();},850);
- var me=ctr('.me');if(me&&me.el)me.el.classList.add('hit');}
+ hurt('me');}
 function superFx(){var v=mkfx('bigok',null,'SUPER!');v.style.fontSize='46px';setTimeout(function(){v.style.transform='translate(-50%,-50%) scale(1) rotate(-6deg)';v.style.opacity='1';},10);setTimeout(function(){v.style.opacity='0';},700);setTimeout(function(){v.remove();},900);
  var t=ctr('.foe');if(t){burst(t.x,t.y,'#ffec3d');burst(t.x,t.y,'#3cc0ff');}critSnd();}
 function levelUpFx(){var c=ctr('.me');lvlSnd();var fl=mkfx('flash',null,null);setTimeout(function(){fl.style.opacity='0';},20);setTimeout(function(){fl.remove();},420);if(!c)return;
@@ -809,7 +837,7 @@ function hit(){
  doMoveFx(S.move,nums,function(){
    hitSnd();if(crit)superFx();if(S.combo>=2)comboBanner(S.combo);
    if(ti.tag==='super')gtoast('&#128293; Super effective!');else if(ti.tag==='resist')toast('&#128737; Not very effective...');
-   S.foe.hp=Math.max(0,S.foe.hp-dmg);var fe=ctr('.foe');if(fe&&fe.el)fe.el.classList.add('hit');floatDmg('.foe',dmg,false);
+   S.foe.hp=Math.max(0,S.foe.hp-dmg);hurt('foe');impactFx('.foe');floatDmg('.foe',dmg,false);
    gainXP(6+(S.move==="simp2"?4:S.move==="simp3"?7:S.move==="fusion"?12:S.move==="scale"?6:5));
    S.msg=S.heroName+" hits &minus;"+dmg+(ti.tag==='super'?" &#128293;super!":ti.tag==='resist'?" (resisted)":"")+(crit?" &#11088;SUPER!":"")+(adapted?" (adapted!)":"")+"!";render();
    setTimeout(function(){ if(S.foe.hp<=0)foeFaint(); else enemyTurn(false); },650);
@@ -825,11 +853,11 @@ function enemyTurn(big){
  S.msg=(S.msg?S.msg+" ":"")+"<b>"+S.foe.n+"</b> attacks!";render();
  doFoeFx(function(){
    var d=takeDmg(big?Math.round(S.foe.atk*1.4):S.foe.atk);
-   if(d>0){S.php=Math.max(0,S.php-d);var me=ctr('.me');if(me&&me.el)me.el.classList.add('hit');floatDmg('.me',d,false);S.msg="<b>"+S.foe.n+"</b> hits &minus;"+d+"!";}else{S.msg="<b>"+S.foe.n+"</b> attacks &mdash; blocked!";}
+   if(d>0){S.php=Math.max(0,S.php-d);hurt('me');impactFx('.me');floatDmg('.me',d,false);S.msg="<b>"+S.foe.n+"</b> hits &minus;"+d+"!";}else{S.msg="<b>"+S.foe.n+"</b> attacks &mdash; blocked!";}
    render();setTimeout(function(){ if(S.php<=0)lose(); else {S.msg="";startTurn();} },900);
  });
 }
-function applyFoeDmg(d){d=takeDmg(d);if(d>0){S.php=Math.max(0,S.php-d);var me=ctr('.me');if(me&&me.el)me.el.classList.add('hit');floatDmg('.me',d,false);S.msg+=" &minus;"+d+"!";}render();setTimeout(function(){ if(S.php<=0)lose(); else {S.msg="";startTurn();} },950);}
+function applyFoeDmg(d){d=takeDmg(d);if(d>0){S.php=Math.max(0,S.php-d);hurt('me');impactFx('.me');floatDmg('.me',d,false);S.msg+=" &minus;"+d+"!";}render();setTimeout(function(){ if(S.php<=0)lose(); else {S.msg="";startTurn();} },950);}
 function bossSlam(blocked,cb){var el=document.querySelector('.foe .mon'),f=ctr('.foe'),h=ctr('.me');if(!el||!f||!h){cb&&cb();return;}
  var dx=h.x-f.x,dy=h.y-f.y;el.style.transition='transform .25s ease-out';el.style.transform='translateY(-54px) scale(1.06)';
  setTimeout(function(){el.style.transition='transform .22s cubic-bezier(.6,0,.95,1)';el.style.transform='translate('+(dx*0.6)+'px,'+(dy*0.6)+'px) scale(1.14)';},280);
@@ -840,7 +868,7 @@ function bossTurn(){
  if(S.stunned){S.stunned=false;S.msg="<b>"+S.foe.n+"</b> is dizzy &#128171; &mdash; it loses its turn!";render();setTimeout(function(){S.msg="";startTurn();},1300);return;}
  if(S.charging){S.charging=false;var big=Math.round(S.foe.atk*2.5);
    if(S.blocked){S.blocked=false;var refl=Math.round(big*0.7);S.msg="&#128737; "+S.heroName+" BLOCKS the slam!";render();
-     bossSlam(true,function(){S.foe.hp=Math.max(0,S.foe.hp-refl);S.stunned=true;var t=ctr('.foe');if(t&&t.el)t.el.classList.add('hit');floatDmg('.foe',refl,false);
+     bossSlam(true,function(){S.foe.hp=Math.max(0,S.foe.hp-refl);S.stunned=true;hurt('foe');impactFx('.foe');floatDmg('.foe',refl,false);
        S.msg="&#128737;&#128293; Repelled! Reflected &minus;"+refl+" &mdash; <b>"+S.foe.n+"</b> is STUNNED!";render();
        setTimeout(function(){ if(S.foe.hp<=0)foeFaint(); else {S.msg="";startTurn();} },1150);});return;}
    S.msg="&#128165; <b>"+S.foe.n+"</b> leaps high &mdash; BODY SLAM!";render();bossSlam(false,function(){applyFoeDmg(big);});return;}
@@ -858,7 +886,7 @@ function gainXP(n){S.xp+=n;while(S.xp>=S.xpNext){S.xp-=S.xpNext;S.lv++;S.pmax+=1
   var un=S.lv===2?" &#128081; Grow Blast & Triple Stomp unlocked!":S.lv===3?" &#128081; Fire Combo unlocked!":"";
   levelUpFx();gtoast('&#11088; LEVEL UP! Lv.'+S.lv+un);}}
 function foeFaint(){
- S.locked=true;gainXP(20+S.ei*5);S.coins+=10+S.ei*2;var ce=ctr('.foe');if(ce)coinPop(ce.x,ce.y);
+ S.locked=true;gainXP(28+S.ei*9);S.coins+=10+S.ei*2;var ce=ctr('.foe');if(ce)coinPop(ce.x,ce.y);
  S.msg="<b>"+S.foe.n+"</b>: "+S.foe.lines.ko+" &#11088;";render();
  var wasBoss=S.foe.boss;
  setTimeout(function(){
@@ -885,8 +913,8 @@ function win(){S.inBattle=false;if(S.timer)clearInterval(S.timer);stopMusic();$(
 
 /* ---------- render ---------- */
 function worldBg(){var b=S.ei;
- if(b<=4)return 'linear-gradient(180deg,#5c94fc 0%,#86bdff 46%,#cfeaff 64%,#5fae3a 64%)';   /* road to the castle */
- if(b<=8)return 'linear-gradient(180deg,#241a30,#3a2a48 52%,#2a2038 64%,#1f1830 64%)';        /* inside the castle */
+ if(b<=2)return 'linear-gradient(180deg,#5c94fc 0%,#86bdff 46%,#cfeaff 64%,#5fae3a 64%)';   /* road to the castle */
+ if(b<=4)return 'linear-gradient(180deg,#241a30,#3a2a48 52%,#2a2038 64%,#1f1830 64%)';        /* inside the castle */
  return 'linear-gradient(180deg,#2a0c12,#5a1018 50%,#7a1410 64%,#3a0a10 64%)';}               /* throne room (final) */
 function hpFill(hp,max,col){var p=Math.max(0,hp/max*100);var c=p<=25?'#e0556a':p<=50?'#f0a93c':col;return '<div class="hpbar"><i style="width:'+p+'%;background:'+c+'"></i></div>';}
 function moveBtn(k,cls){
@@ -938,11 +966,11 @@ function castleSil(w){var h=Math.round(w*0.72);return '<svg width="'+w+'" height
  +'<polygon points="48,16 60,5 72,16" fill="#b23a5a"/><rect x="59" y="5" width="2" height="6" fill="#b23a5a"/><path d="M61 5 l9 3 l-9 3 Z" fill="#ffd24a"/>'
  +'<rect x="54" y="60" width="12" height="26" rx="6" fill="#2a2030"/></svg>';}
 function bgDecor(){var b=S.ei;var h='';
- if(b<=4){
+ if(b<=2){
    h+='<div style="position:absolute;left:4%;top:5%;z-index:1;filter:drop-shadow(0 0 16px rgba(255,210,60,.6))">'+sunSVG(92)+'</div>';
    h+='<div style="position:absolute;left:34%;top:7%;opacity:.96;z-index:1">'+mcCloudSVG(96)+'</div><div style="position:absolute;left:70%;top:12%;opacity:.88;z-index:1">'+mcCloudSVG(116)+'</div>';
-   var cw=120+b*46; /* castle grows nearer each world (W1 far -> W5 the gate) */
-   var cop=(0.55+b*0.09).toFixed(2); /* distant worlds hazier, the gate (W5) solid */
+   var cw=120+b*92; /* castle grows nearer each world (W1 far -> W3 the gate) */
+   var cop=(0.55+b*0.18).toFixed(2); /* distant worlds hazier, the gate (W3) solid */
    h+='<div style="position:absolute;left:50%;bottom:36%;transform:translate(-50%,0);z-index:1;opacity:'+cop+';filter:saturate(.85)">'+castleSil(cw)+'</div>';
    /* Minecraft-style scenery: blocky shrub on the horizon, pixel trees on the field, pixel flowers on the grass */
    h+='<div style="position:absolute;left:30%;bottom:34%;z-index:1;opacity:.92">'+mcBushSVG(96)+'</div>';
@@ -955,22 +983,23 @@ function bgDecor(){var b=S.ei;var h='';
    h+='<div style="position:absolute;left:0;right:0;top:0;height:34px;background:repeating-linear-gradient(90deg,#4a3f58 0 30px,#382f46 30px 33px);box-shadow:inset 0 -4px 6px rgba(0,0,0,.4)"></div>';
    h+='<div style="position:absolute;left:2%;top:30px;bottom:34px;width:30px;background:linear-gradient(90deg,#564a66,#6a5c7e,#3f3550)"></div><div style="position:absolute;right:2%;top:30px;bottom:34px;width:30px;background:linear-gradient(90deg,#3f3550,#6a5c7e,#564a66)"></div>';
    h+='<div class="torch" style="left:9%;top:23%">&#128293;</div><div class="torch" style="right:9%;top:23%">&#128293;</div>';
-   if(b>=9)h+='<div style="position:absolute;left:0;right:0;bottom:34px;height:9px;background:linear-gradient(#ff7a2a,#c41010);box-shadow:0 0 18px #ff5a2a;z-index:1"></div>';
+   if(b>=5)h+='<div style="position:absolute;left:0;right:0;bottom:34px;height:9px;background:linear-gradient(#ff7a2a,#c41010);box-shadow:0 0 18px #ff5a2a;z-index:1"></div>';
  }
  return h;}
+function taskB(col,icon,txt){return '<div class="taskb" style="background:'+col+'"><span class="tbi">'+icon+'</span><span>'+txt+'</span></div>';}
 function render(){
  var f=S.foe;
  var weakLine=f.weak?'<div class="weakline">&#127919; WEAK: <b>'+MV[f.weak].name+'</b> &#215;1.6'+(f.resist?'<span class="res"> &middot; &#128737;'+MV[f.resist].name+' &#189;</span>':'')+'</div>':'';
  var minHTML='';
  var sz=f.boss?128:112;
- var bsv=monSVG(f.draw,f.c,f.d,sz);if(S.charging)bsv=bsv.replace('class="mon"','class="mon charging"');if(S.shielded)bsv=bsv.replace('class="mon"','class="mon shielded"');
+ var bsv=monSVG(f.draw,f.c,f.d,sz);if(S.charging)bsv=bsv.replace('class="mon"','class="mon charging"');if(S.shielded)bsv=bsv.replace('class="mon"','class="mon shielded"');if(S.fxHurtFoe)bsv=bsv.replace('class="mon','class="mon hit');
  var stunHTML=S.stunned?'<div class="stunfx">&#128171;&#11088;&#128171;</div>':'';
  var shieldSide=function(side){return '<span class="shieldside '+side+'">'+monSVG(sGoomba,'#caa9ec','#6a4fb0',44)+'<span class="sblbl">&#128737;</span></span>';};
  var shL=S.minions?shieldSide('l'):'';var shR=S.minions?shieldSide('r'):'';
  var foeBox='<div class="statbox foebox"><div class="nm"><span class="nn">'+f.n+'</span><span class="type" style="background:'+f.tc+'">'+f.t+'</span><span class="lv">Lv.'+(S.ei+3)+'</span></div><div class="hprow"><span class="hpl">HP</span>'+hpFill(f.hp,f.max,'#e0463a')+'</div><div class="hpnum">'+f.hp+' / '+f.max+'</div>'+weakLine+'</div>';
  var foeHTML='<div class="foe"><div style="position:relative;display:inline-block'+(S.stunned?'" class="stunwrap':'')+'">'+stunHTML+shL+bsv+shR+'</div></div>';
  var cageHTML=(S.ei===ENEMIES.length-1)?'<div class="cage"><div class="cagelbl">&#128557; Princess!</div><div class="cagebars">'+princess(58)+'</div></div>':'';
- var meCls=S.starInvuln?'mon starman':'mon';
+ var meCls=(S.starInvuln?'mon starman':'mon')+(S.fxHurtMe?' hit':'');
  var heroSvg=monSVG(heroPlumber,'','',112).replace('class="mon"','class="'+meCls+'"');
  var meBox='<div class="statbox mebox"><div class="nm"><span class="nn">'+S.heroName+'</span><span class="type" style="background:#2e9e5b">HERO</span><span class="lv">Lv.'+S.lv+'</span></div><div class="hprow"><span class="hpl">HP</span>'+hpFill(S.php,S.pmax,'#2e9e5b')+'</div><div class="hpnum">'+S.php+' / '+S.pmax+'</div><div class="xprow"><span class="xpl">XP</span><div class="xpbar"><i style="width:'+Math.round(S.xp/S.xpNext*100)+'%"></i></div></div></div>';
  var meHTML='<div class="me">'+heroSvg+'</div>';
@@ -986,11 +1015,13 @@ function render(){
  } else if(S.ui==="block"){
    var bopts=S.quizOpts.map(function(o){return '<button class="qopt" onclick="answerBlock(\''+o+'\')">'+fmtMath(o)+'</button>';}).join('');
    bottom='<div class="puz"><div class="ph"><span>&#128737; SHELL BLOCK &mdash; '+S.blockProg+' / 3 correct</span><span class="rt" id="rt">0:'+(S.rt<10?"0":"")+S.rt+'</span></div>'+
+     taskB('#3a2a66','&#128737;','<b>TAP the correct answer 3 times in a row</b> to block the mega attack!')+
      '<div class="quizq">'+fmtMath(S.quiz.q)+'</div><div class="qopts">'+bopts+'</div>'+
      '<div class="prow"><span class="hint">3 in a row &rarr; block AND reflect <b>70%</b> back!</span></div></div>';
  } else if(S.ui==="heal"){
    var opts=S.quizOpts.map(function(o){return '<button class="qopt" onclick="answerQuiz(\''+o+'\')">'+fmtMath(o)+'</button>';}).join('');
    bottom='<div class="puz"><div class="ph"><span>&#127812; Mushroom Guard &mdash; answer to heal!</span><span class="rt" id="rt">0:'+(S.rt<10?"0":"")+S.rt+'</span></div>'+
+     taskB('#2e9e5b','&#127812;','<b>TAP the correct answer</b> to heal &frac14; of your HP!')+
      '<div class="quizq">'+fmtMath(S.quiz.q)+'</div><div class="qopts">'+opts+'</div>'+
      '<div class="prow"><button class="back" onclick="backMove()">&#8617; Move</button><span class="hint">Correct &rarr; recover &frac14; HP</span></div></div>';
  } else if(S.ui==="equiv"){
@@ -999,7 +1030,7 @@ function render(){
    var eq='<div class="ratio">'+box(a,S.cols[0])+'<span class="colon">:</span>'+box(b,S.cols[1])+'<span class="colon" style="color:#3a2270">=</span>'+box(c,S.cols[0])+'<span class="colon">:</span>'+box(d,S.cols[1])+'</div>';
    var eopts=S.eqOpts.map(function(v){return '<button class="qopt" onclick="answerEquiv('+v+')">'+v+'</button>';}).join('');
    bottom='<div class="puz"><div class="ph"><span>'+MV.equiv.name+'</span><span class="rt" id="rt">0:'+(S.rt<10?"0":"")+S.rt+'</span></div>'+
-     '<div class="hint" style="margin-bottom:2px">'+(S.flavor||'')+'</div>'+eq+
+     taskB('#e0922f','&#127919;','<b>TAP the number</b> that goes in the <b>?</b> box &mdash; keep BOTH sides EQUAL!')+eq+
      '<div class="hint" style="font-size:10px;margin-top:1px">keep the same proportion</div>'+ratioBar([a,b],S.cols,200)+
      '<div class="qopts">'+eopts+'</div>'+
      '<div class="prow"><button class="back" onclick="backMove()">&#8617; Move</button><span class="hint">Same ratio both sides &mdash; first try = SUPER!</span></div></div>';
@@ -1010,14 +1041,17 @@ function render(){
    var facs='';[2,3,4,5].forEach(function(x){facs+='<button class="fac" onclick="scaleBy('+x+')">&times;'+x+'</button>';});facs+='<button class="fac" onclick="scaleReset()">&#8634;</button>';
    var scaleQ='<div class="scaleq"><span class="qb">'+S.scaleBase[0]+'</span> : <span class="qb2">'+S.scaleBase[1]+'</span><span class="ar">&rArr;</span><span class="qb">'+(S.scaleBase[0]*S.scaleK)+'</span> : <span class="qm">?</span></div>';
    bottom='<div class="puz"><div class="ph"><span>'+MV.scale.name+'</span><span class="rt" id="rt">0:'+(S.rt<10?"0":"")+S.rt+'</span></div>'+
-     '<div class="hint" style="margin-bottom:2px">'+(S.flavor||'')+'</div>'+scaleQ+cur+
+     taskB('#3aa64a','&#10006;&#65039;','<b>TAP a &times; button</b> to grow <b>'+S.scaleBase[0]+'</b> into <b>'+tgt[0]+'</b> &mdash; BOTH numbers grow together!')+scaleQ+cur+
      '<div class="facs">'+facs+'</div>'+
      '<div class="prow"><button class="back" onclick="backMove()">&#8617; Move</button><span class="hint">'+(done?'Reached! Firing...':'Work out the factor yourself &mdash; one correct tap = SUPER!')+'</span></div></div>';
  } else {
    var inner='';
    if(S.move==="simp2"||S.move==="simp3"){
      var facs='';[2,3,4,5,6,7,9].forEach(function(x){facs+='<button class="fac" onclick="divideBy('+x+')">&divide;'+x+'</button>';});
-     inner='<div class="hint" style="margin-bottom:2px">'+(S.flavor||'')+'</div><div class="ratio">'+chips(S.terms,S.cols)+'</div>'+ratioBar(S.terms,S.cols)+'<div class="facs">'+facs+'</div><div class="hint">Pick a COMMON factor &mdash; the bar keeps the same shape! Simplest in ONE step = SUPER!</div>';
+     var sCol=S.move==="simp3"?'#8a5cd0':'#2f7eb5';
+     var sTxt=S.move==="simp3"?'<b>TAP a &divide; button</b> that divides ALL 3 numbers &mdash; make them SMALLEST, then <b>ATTACK</b>!'
+                              :'<b>TAP a &divide; button</b> that divides BOTH numbers &mdash; make them SMALLEST, then <b>ATTACK</b>!';
+     inner=taskB(sCol,'&#10135;',sTxt)+'<div class="ratio">'+chips(S.terms,S.cols)+'</div>'+ratioBar(S.terms,S.cols)+'<div class="facs">'+facs+'</div><div class="hint">Pick a COMMON factor &mdash; the bar keeps the same shape! Simplest in ONE step = SUPER!</div>';
    } else {
      var L=S.shareT;
      function cardG(idx){var c=(idx===1)?S.c1:S.c2;var nL=(idx===1)?S.ln[0]:S.ln[1],nR=(idx===1)?S.ln[1]:S.ln[2];var cL=(idx===1)?S.lc[0]:S.lc[1],cR=(idx===1)?S.lc[1]:S.lc[2];var shR=(idx===1),shL=(idx===2);
@@ -1025,18 +1059,21 @@ function render(){
        if(S.fstep!=="lcm"){ctrl=done?'<span class="okmark">&#10003;</span>':(S.fstep==="mult"?['2','3','4','5','6'].map(function(x){return '<button class="lb" onclick="multCardG('+idx+','+x+')">&times;'+x+'</button>';}).join(''):'');}
        return '<div class="lcard"><div class="lhdr">'+nL+' : '+nR+'</div><div style="display:flex;align-items:center;gap:5px">'+
          '<span class="chip'+(shL?' gsh':'')+'" style="background:'+cL+'">'+c[0]+'</span><span class="colon">:</span><span class="chip'+(shR?' gsh':'')+'" style="background:'+cR+'">'+c[1]+'</span></div><div class="lbtns">'+ctrl+'</div></div>';}
-     var prompt;
+     var prompt,fbanner;
      if(S.fstep==="lcm"){var fopts=S.lcmOpts.map(function(n){return '<button class="lb lcmopt" onclick="answerLCM('+n+')">'+n+'</button>';}).join('');
        prompt='<div class="lcmq">&#128279; LCM of <b style="color:'+S.lc[1]+'">'+S.c1b[1]+'</b> &amp; <b style="color:'+S.lc[1]+'">'+S.c2b[0]+'</b> &nbsp;=&nbsp; '+fopts+'</div>';
+       fbanner=taskB('#c4281c','&#128279;','<b>STEP 1 of 3:</b> TAP the LCM &mdash; the smallest number BOTH <b>'+S.c1b[1]+'</b> and <b>'+S.c2b[0]+'</b> go into!');
      } else if(S.fstep==="mult"){prompt='<div class="hint">&times;? &rarr; make each <b style="color:'+S.lc[1]+'">'+S.ln[1]+'</b> become <b style="color:#ffec3d">'+L+'</b></div>';
+       fbanner=taskB('#c4281c','&#10006;&#65039;','<b>STEP 2 of 3:</b> TAP &times; on each card until BOTH middle numbers become <b>'+L+'</b>!');
      } else {var copts=S.combineOpts.map(function(o){return '<button class="lb lcmopt" onclick="answerCombine(\''+o+'\')">'+o+'</button>';}).join('');
-       prompt='<div class="lcmq">&#10024; '+S.ln[0]+' : '+S.ln[1]+' : '+S.ln[2]+' &nbsp;=&nbsp; '+copts+'</div>';}
-     inner='<div class="hint" style="margin-bottom:2px">'+(S.flavor||'')+'</div>'+cardG(1)+cardG(2)+prompt;
+       prompt='<div class="lcmq">&#10024; '+S.ln[0]+' : '+S.ln[1]+' : '+S.ln[2]+' &nbsp;=&nbsp; '+copts+'</div>';
+       fbanner=taskB('#c4281c','&#10024;','<b>STEP 3 of 3:</b> TAP the correct combined ratio <b>'+S.ln[0]+' : '+S.ln[1]+' : '+S.ln[2]+'</b>!');}
+     inner=fbanner+cardG(1)+cardG(2)+prompt;
    }
    bottom='<div class="puz"><div class="ph"><span>'+MV[S.move].name+'</span><span class="rt" id="rt">0:'+(S.rt<10?"0":"")+S.rt+'</span></div>'+inner+
      '<div class="prow"><button class="back" onclick="backMove()">&#8617; Move</button>'+((S.move==="fusion")?'':'<button class="atk" onclick="attack()">&#127812; ATTACK!</button>')+'</div></div>';
  }
- $('game').innerHTML='<div class="arena" style="background:'+worldBg()+'">'+bgDecor()+'<div class="bigtimer'+(S.rt<=5?' danger':'')+'" id="bigtimer">'+Math.max(0,S.rt)+'</div>'+cageHTML+foeBox+foeHTML+minHTML+meBox+meHTML+'<div class="ground'+(S.ei>4?' stone':'')+'"></div></div><div class="panel">'+bottom+'</div>';
+ $('game').innerHTML='<div class="arena" style="background:'+worldBg()+'">'+bgDecor()+'<div class="bigtimer'+(S.rt<=5?' danger':'')+'" id="bigtimer">'+Math.max(0,S.rt)+'</div>'+cageHTML+foeBox+foeHTML+minHTML+meBox+meHTML+'<div class="ground'+(S.ei>2?' stone':'')+'"></div></div><div class="panel">'+bottom+'</div>';
  var ib=$('invbar');if(ib)ib.innerHTML=invBarInner();
  $('foenum').textContent=(S.ei+1);$('coins').textContent=S.coins;
 }
@@ -1052,7 +1089,7 @@ function showStart(){
  $('overlay').classList.remove('hide');
  $('overlay').innerHTML='<div class="startcard" style="max-width:640px">'
   +'<div class="ttl">&#127812; Ratio Quest</div>'
-  +'<div class="sub" style="font-size:13px;color:#5f6b76;font-weight:800">Beat 10 foes with smart ratios &mdash; rescue the Princess!</div>'
+  +'<div class="sub" style="font-size:13px;color:#5f6b76;font-weight:800">Beat 6 foes with smart ratios &mdash; rescue the Princess!</div>'
   +'<div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0 2px">'
     +'<div style="text-align:center">'+monSVG(heroPlumber,'','',64)+'<div style="font-size:10px;font-weight:900;color:#2e7d3a">YOU</div></div>'
     +'<span style="font-size:26px">&#9876;&#65039;</span>'
